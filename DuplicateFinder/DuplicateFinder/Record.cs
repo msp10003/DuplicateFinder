@@ -12,9 +12,11 @@ namespace DuplicateFinder
         private String firstName, lastName, middleName;
         private DateTime claimDate;
         private long claimNumber;
+        private int recordID;
 
-        public Record(String first, String last, String middle, DateTime date, long claimNum)
+        public Record(int ID, String first, String last, String middle, DateTime date, long claimNum)
         {
+            recordID = ID;
             firstName = first;
             lastName = last;
             middleName = middle;
