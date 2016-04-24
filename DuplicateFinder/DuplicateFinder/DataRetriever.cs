@@ -11,15 +11,19 @@ namespace DuplicateFinder
 {
     class DataRetriever
     {
-        private String spreadSheetPath;
+        private String spreadSheetPath, nameColumn, claimNumColumn, claimDateColumn, descriptionCol;
         private ExcelFile excelFile;
         private ExcelWorksheet worksheet;
 
-        public DataRetriever(String pathName)
+        public DataRetriever(String pathName, String nameCol, String claimNumCol, String claimDateCol, String descCol)
         {
             spreadSheetPath = pathName;
             excelFile = ExcelFile.Load(spreadSheetPath);
             worksheet = excelFile.Worksheets.ActiveWorksheet;
+            nameColumn = nameCol;
+            claimNumColumn = claimNumCol;
+            claimDateColumn = claimDateCol;
+            descriptionCol = descCol;
         }
 
         public ExcelFile setSpreadsheet(String pathName)
@@ -36,5 +40,30 @@ namespace DuplicateFinder
             return row;
         }
 
+        public ExcelFile getExcelFile()
+        {
+            return excelFile;
+        }
+
+        public ExcelRowCollection getRows()
+        {
+            return worksheet.Rows;
+        }
+
+        public String getClaimNum(ExcelRow row)
+        {
+            return row.Cells[claimNumColumn].StringValue;
+        }
+
+        public String getClaimDate(ExcelRow row)
+        {
+            //TODO: convert the string to a datetime
+            return row.Cells[claimDateColumn].StringValue;
+        }
+
+        public String getName(ExcelRow row)
+        {
+            return row.Cells[nameColumn].StringValue;
+        }
     }
 }
