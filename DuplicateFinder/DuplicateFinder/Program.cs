@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SpreadsheetLight;
 
 namespace DuplicateFinder
 {
@@ -10,7 +8,7 @@ namespace DuplicateFinder
     {
         static void Main(string[] args)
         {
-            DataRetriever dataRetriever = new DataRetriever("C:\\Users\\Matthew\\Documents\\Duplicate Project\\Losses - Kimon Working 2 (for Matt).xlsx", "C", null, "I", "J");
+            DataRetriever dataRetriever = new DataRetriever("C:\\Users\\Matthew\\Documents\\Duplicate Project\\Sample1.xlsx", "C", null, "I", "J");
             DataSet data = new DataSet(dataRetriever);
             Console.Read();
         }

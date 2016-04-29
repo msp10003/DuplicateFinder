@@ -4,8 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using GemBox.Spreadsheet;
-
 namespace DuplicateFinder
 {
     class DataSet
@@ -22,9 +20,11 @@ namespace DuplicateFinder
             ICollection<Record> records = mapper.mapRows(data);
             foreach(Record r in records)
             {
-                lastNameTree.Add(r.getFullName(), r);
+                Console.SetBufferSize(500, 600);
+                System.Console.Out.Write(r.ToString()+"\n");
+                //lastNameTree.Add(r.getFullName(), r);
             }
         }
-
+        
     }
 }

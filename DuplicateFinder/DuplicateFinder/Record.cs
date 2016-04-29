@@ -12,10 +12,10 @@ namespace DuplicateFinder
         //TODO: use get and set syntax
         private String firstName, lastName, middleName, description, fullName;
         private DateTime claimDate;
-        private long claimNumber;
+        private Int64 claimNumber;
         private int recordID;
 
-        public Record(int ID, String last, String first, String middle, DateTime date, long claimNum, string desc)
+        public Record(int ID, String last, String first, String middle, DateTime date, Int64 claimNum, string desc)
         {
             recordID = ID;
             firstName = first;
@@ -30,6 +30,12 @@ namespace DuplicateFinder
         public String getFullName()
         {
             return fullName;
+        }
+
+        public override string ToString()
+        {
+            string s = "ID: " + recordID + " " + fullName + " " + claimNumber + " " + description;
+            return s;
         }
     }
 }

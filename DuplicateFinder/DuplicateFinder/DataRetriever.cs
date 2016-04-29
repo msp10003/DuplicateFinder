@@ -4,91 +4,113 @@
  * */
 
 using System;
-using GemBox.Spreadsheet;
+using SpreadsheetLight;
+using System.Collections.Generic;
 
 namespace DuplicateFinder
 {
     class DataRetriever
     {
         private String spreadSheetPath, nameColumn, claimNumColumn, claimDateColumn, descriptionCol;
-        private ExcelFile excelFile;
-        private ExcelWorksheet worksheet;
+        private SLDocument excelFile;
+        public int numCols, numRows;
+        private List<SLCellPointRange> rows;
 
         public DataRetriever(String pathName, String nameCol, String claimNumCol, String claimDateCol, String descCol)
         {
-            SpreadsheetInfo.SetLicense("FREE-LIMITED-KEY");
             spreadSheetPath = pathName;
-            excelFile = ExcelFile.Load(spreadSheetPath);
-            worksheet = excelFile.Worksheets.ActiveWorksheet;
+            excelFile = new SLDocument(pathName);
             nameColumn = nameCol;
             claimNumColumn = claimNumCol;
             claimDateColumn = claimDateCol;
             descriptionCol = descCol;
+            numCols = 1;
+            numRows = 1;
         }
 
-        public ExcelFile setSpreadsheet(String pathName)
+        public SLDocument setSpreadsheet(String pathName)
         {
             spreadSheetPath = pathName;
-            excelFile = ExcelFile.Load(spreadSheetPath);
-            worksheet = excelFile.Worksheets.ActiveWorksheet;
+            excelFile = new SLDocument(spreadSheetPath);
             return excelFile;
         }
 
-        public ExcelRow getRow(int rowNum)
+        /*public ExcelRow getRow(int rowNum)
         {
-            ExcelRow row = worksheet.Rows[rowNum];
+            SLCellPointRange cellRange = new SLCellPointRange()
             return row;
-        }
+        }*/
 
-        public ExcelFile getExcelFile()
+        public SLDocument getExcelFile()
         {
             return excelFile;
         }
 
-        public ExcelRowCollection getRows()
+        public ICollection<SLCellPointRange> getRows()
         {
-            return worksheet.Rows;
+            if(rows != null)
+            {
+                return rows;
+            }
+
+            rows = new List<SLCellPointRange>();
+
+            while (true)
+            {
+                String s = excelFile.GetCellValueAsString(1, numCols);
+                if (String.IsNullOrEmpty(excelFile.GetCellValueAsString(1, numCols)))
+                {
+                    break;
+                }
+                numCols++;
+            }
+
+            while (true)
+            {
+                if(String.IsNullOrEmpty(excelFile.GetCellValueAsString(numRows,1)))
+                {
+                    break;
+                }
+                rows.Add(new SLCellPointRange(numRows, 1, numRows, numCols));
+                numRows++;
+
+            }
+            return rows;
         }
 
-        public long getClaimNum(ExcelRow row)
+        public Int64 getClaimNum(int rowNum)
         {
             if (claimNumColumn == null)
             {
                 return 0;
             }
-            long claimNum;
-            if(long.TryParse(row.Cells[claimNumColumn].StringValue, out claimNum))
-            {
-                return claimNum;
-            }
-            return 0;
+
+            String cellIndex = claimNumColumn + rowNum;
+            return excelFile.GetCellValueAsInt64(cellIndex);
         }
 
-        public DateTime getClaimDate(ExcelRow row)
+        public DateTime getClaimDate(int rowNum)
         {
-            //TODO: convert the string to a datetime
-            String dateString = row.Cells[claimDateColumn].StringValue;
-            DateTime claimDate;
-            if (DateTime.TryParse(dateString, out claimDate))
-            {
-                return claimDate;
-            }
-            return new DateTime();
+            String cellIndex = claimDateColumn + rowNum;
+            return excelFile.GetCellValueAsDateTime(cellIndex);
         }
 
-        public String getName(ExcelRow row)
+        public String getName(int rowNum)
         {
-            return row.Cells[nameColumn].StringValue;
+            String cellIndex = nameColumn + rowNum;
+            return excelFile.GetCellValueAsString(cellIndex);
         }
 
-        public String getDescription(ExcelRow row)
+        public String getDescription(int rowNum)
         {
-            return row.Cells[descriptionCol].StringValue;
+            String cellIndex = descriptionCol + rowNum;
+            return excelFile.GetCellValueAsString(cellIndex);
         }
 
-        public int getRowID(ExcelRow row)
+        public int getRowID(SLCellPointRange cpr)
         {
-            return row.Index;
+            return cpr.StartRowIndex;
         }
+
     }
 }

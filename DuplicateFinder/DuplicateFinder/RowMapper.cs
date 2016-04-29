@@ -3,8 +3,8 @@
  * */
 
 using System.Collections.Generic;
-using GemBox.Spreadsheet;
 using System;
+using SpreadsheetLight;
 
 namespace DuplicateFinder
 {
@@ -21,23 +21,23 @@ namespace DuplicateFinder
         {
             List<Record> records = new List<Record>();
 
-            foreach(ExcelRow row in dataRetriever.getRows())
+            foreach(SLCellPointRange cpr in dataRetriever.getRows())
             {
-                Record r = rowToRecord(row, dataRetriever);
+                Record r = rowToRecord(cpr, dataRetriever);
                 records.Add(r);
             }
 
             return records;
         }
 
-        private Record rowToRecord(ExcelRow row, DataRetriever dataRetriever)
+        private Record rowToRecord(SLCellPointRange cpr, DataRetriever dataRetriever)
         {
-            long claimNum = dataRetriever.getClaimNum(row);
-            String claimDesc = dataRetriever.getDescription(row);
-            DateTime claimDate = dataRetriever.getClaimDate(row);
-            String name = dataRetriever.getName(row);
+            Int64 claimNum = dataRetriever.getClaimNum(cpr.StartRowIndex);
+            String claimDesc = dataRetriever.getDescription(cpr.StartRowIndex);
+            DateTime claimDate = dataRetriever.getClaimDate(cpr.StartRowIndex);
+            String name = dataRetriever.getName(cpr.StartRowIndex);
             String[] nameTokens = parser.parseName(name);
-            int recordID = dataRetriever.getRowID(row);
+            int recordID = dataRetriever.getRowID(cpr);
             return new Record(recordID, nameTokens[0], nameTokens[1], nameTokens[2], claimDate, claimNum, claimDesc);
         }
     }
