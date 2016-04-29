@@ -4,7 +4,6 @@
  * */
 
 using System;
-using System.Collections.Generic;
 using GemBox.Spreadsheet;
 
 namespace DuplicateFinder
@@ -17,6 +16,7 @@ namespace DuplicateFinder
 
         public DataRetriever(String pathName, String nameCol, String claimNumCol, String claimDateCol, String descCol)
         {
+            SpreadsheetInfo.SetLicense("FREE-LIMITED-KEY");
             spreadSheetPath = pathName;
             excelFile = ExcelFile.Load(spreadSheetPath);
             worksheet = excelFile.Worksheets.ActiveWorksheet;
@@ -50,20 +50,45 @@ namespace DuplicateFinder
             return worksheet.Rows;
         }
 
-        public String getClaimNum(ExcelRow row)
+        public long getClaimNum(ExcelRow row)
         {
-            return row.Cells[claimNumColumn].StringValue;
+            if (claimNumColumn == null)
+            {
+                return 0;
+            }
+            long claimNum;
+            if(long.TryParse(row.Cells[claimNumColumn].StringValue, out claimNum))
+            {
+                return claimNum;
+            }
+            return 0;
         }
 
-        public String getClaimDate(ExcelRow row)
+        public DateTime getClaimDate(ExcelRow row)
         {
             //TODO: convert the string to a datetime
-            return row.Cells[claimDateColumn].StringValue;
+            String dateString = row.Cells[claimDateColumn].StringValue;
+            DateTime claimDate;
+            if (DateTime.TryParse(dateString, out claimDate))
+            {
+                return claimDate;
+            }
+            return new DateTime();
         }
 
         public String getName(ExcelRow row)
         {
             return row.Cells[nameColumn].StringValue;
+        }
+
+        public String getDescription(ExcelRow row)
+        {
+            return row.Cells[descriptionCol].StringValue;
+        }
+
+        public int getRowID(ExcelRow row)
+        {
+            return row.Index;
         }
     }
 }

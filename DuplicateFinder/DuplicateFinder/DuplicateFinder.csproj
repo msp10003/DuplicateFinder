@@ -37,6 +37,10 @@
       <HintPath>..\packages\GemBox.Spreadsheet.39.3.30.1153\lib\net30\GemBox.Spreadsheet.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="SpreadsheetLight, Version=3.4.4.0, Culture=neutral, PublicKeyToken=32fbb46dc1730c57, processorArchitecture=MSIL">
+      <HintPath>..\packages\SpreadsheetLight.3.4.4\lib\SpreadsheetLight.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />

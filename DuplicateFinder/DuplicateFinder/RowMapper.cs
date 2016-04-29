@@ -4,31 +4,41 @@
 
 using System.Collections.Generic;
 using GemBox.Spreadsheet;
+using System;
 
 namespace DuplicateFinder
 {
     class RowMapper
     {
-     /*   DataRetriever dataRetriever;
+        NameParser parser;
 
-        public RowMapper(DataRetriever data)
+        public RowMapper()
         {
-            dataRetriever = data;
+            parser = new NameParser();
         }
 
-        public ICollection<Record> mapRows()
+        public ICollection<Record> mapRows(DataRetriever dataRetriever)
         {
+            List<Record> records = new List<Record>();
+
             foreach(ExcelRow row in dataRetriever.getRows())
             {
-                
-                ExcelCell 
-                    Record record = new Record(row.)
+                Record r = rowToRecord(row, dataRetriever);
+                records.Add(r);
             }
+
+            return records;
         }
 
-        public Record rowToRecord(ExcelRow row)
+        private Record rowToRecord(ExcelRow row, DataRetriever dataRetriever)
         {
-            row.Cells
-        }*/
+            long claimNum = dataRetriever.getClaimNum(row);
+            String claimDesc = dataRetriever.getDescription(row);
+            DateTime claimDate = dataRetriever.getClaimDate(row);
+            String name = dataRetriever.getName(row);
+            String[] nameTokens = parser.parseName(name);
+            int recordID = dataRetriever.getRowID(row);
+            return new Record(recordID, nameTokens[0], nameTokens[1], nameTokens[2], claimDate, claimNum, claimDesc);
+        }
     }
 }

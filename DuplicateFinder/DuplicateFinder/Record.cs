@@ -9,12 +9,13 @@ namespace DuplicateFinder
 {
     class Record
     {
-        private String firstName, lastName, middleName, description;
+        //TODO: use get and set syntax
+        private String firstName, lastName, middleName, description, fullName;
         private DateTime claimDate;
         private long claimNumber;
         private int recordID;
 
-        public Record(int ID, String first, String last, String middle, DateTime date, long claimNum, string desc)
+        public Record(int ID, String last, String first, String middle, DateTime date, long claimNum, string desc)
         {
             recordID = ID;
             firstName = first;
@@ -23,6 +24,12 @@ namespace DuplicateFinder
             claimDate = date;
             claimNumber = claimNum;
             description = desc;
+            fullName = last + " " + first + " " + middle;
+        }
+
+        public String getFullName()
+        {
+            return fullName;
         }
     }
 }

@@ -10,15 +10,8 @@ namespace DuplicateFinder
     {
         static void Main(string[] args)
         {
-            NameParser parser = new NameParser();
-            String[] name = parser.parseName("Michael B. Jordan");
-            for(int i =0; i<3; i++)
-            {
-                if(i==0) Console.Out.Write("Last Name:");
-                else if (i == 1) Console.Out.Write("First Name:");
-                else if (i == 2) Console.Out.Write("Middle Name:");
-                Console.Out.WriteLine(name[i]);
-            }
+            DataRetriever dataRetriever = new DataRetriever("C:\\Users\\Matthew\\Documents\\Duplicate Project\\Losses - Kimon Working 2 (for Matt).xlsx", "C", null, "I", "J");
+            DataSet data = new DataSet(dataRetriever);
             Console.Read();
         }
     }
