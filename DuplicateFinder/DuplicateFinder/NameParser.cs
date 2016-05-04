@@ -1,5 +1,5 @@
 ﻿/*Class: NameParser
- * Class called to split raw name string into a first, last, and middle name
+ * Class for performing various parsing actions on a string
  * */
 
 using System;
@@ -45,7 +45,7 @@ namespace DuplicateFinder
                     //possibly time to delimit, check what the last item we saw was
                     if (Char.IsLetter(lastSeen))
                     {   //we have seen the end of a token, add it to our list of tokens
-                        tokens.Add(currentToken);
+                        tokens.Add(currentToken.ToUpper());
                         currentToken = "";
                     }
                     if (strCopy[i].Equals(',')) includesCommas = true;
@@ -56,7 +56,7 @@ namespace DuplicateFinder
                 {
                     if(currentToken.Length > 0)
                     {
-                        tokens.Add(currentToken);
+                        tokens.Add(currentToken.ToUpper());
                         currentToken = "";
                     }
                     while (!strCopy[i].Equals(')')){
@@ -71,7 +71,7 @@ namespace DuplicateFinder
 
                 if ((i+1) >= strCopy.Length)    //if we reach the end of the list, force tokenization
                 {
-                    if (currentToken.Length > 0) tokens.Add(currentToken);
+                    if (currentToken.Length > 0) tokens.Add(currentToken.ToUpper());
                 }
             }
             nameArray = interpretName(tokens, includesCommas, isNumber);
@@ -117,6 +117,54 @@ namespace DuplicateFinder
                 }
             }
             return nameArray;
+        }
+
+        /// <summary>
+        /// Parses each part of a record's name into n-grams
+        /// </summary>
+        /// <param name="r"></param>
+        /// <returns></returns>
+        public List<String> parseRecordNGrams(Record r, int n)
+        {
+            List<String> nGrams = new List<String>();
+            if (r.getFirstName() != null) nGrams.AddRange(parseNGrams(r.getFirstName(), n));
+            if (r.getLastName() != null) nGrams.AddRange(parseNGrams(r.getLastName(), n));
+            if (r.getMiddleName() != null) nGrams.AddRange(parseNGrams(r.getMiddleName(), n));
+            return nGrams;
+        }
+
+        /// <summary>
+        /// Parses a generic string into n-grams
+        /// </summary>
+        /// <param name="s">Input string</param>
+        /// <param name="n">Size of n-gram substrings</param>
+        /// <returns></returns>
+        public List<String> parseNGrams(String s, int n)
+        {
+            List<String> nGrams = new List<String>();
+            String nGramSub = "";
+
+            for(int i=0; i<s.Length; i++)
+            {
+                int remainingChars = s.Length - i;
+                if(remainingChars < n)
+                {
+                    for(int j=0; j<remainingChars; j++)
+                    {
+                        nGramSub = nGramSub + s[i + j];
+                    }
+                }
+                else
+                {
+                    for (int j = 0; j < n; j++)
+                    {
+                        nGramSub = nGramSub + s[i + j];
+                    }
+                }
+                nGrams.Add(nGramSub);
+                nGramSub = "";
+            }
+            return nGrams;
         }
 
     }

@@ -38,7 +38,9 @@ namespace DuplicateFinder
             String name = dataRetriever.getName(cpr.StartRowIndex);
             String[] nameTokens = parser.parseName(name);
             int recordID = dataRetriever.getRowID(cpr);
-            return new Record(recordID, nameTokens[0], nameTokens[1], nameTokens[2], claimDate, claimNum, claimDesc);
+            Record r = new Record(recordID, nameTokens[0], nameTokens[1], nameTokens[2], claimDate, claimNum, claimDesc);
+            r.nGrams = parser.parseNGrams(r.getFullName(), 3);
+            return r;
         }
     }
 }

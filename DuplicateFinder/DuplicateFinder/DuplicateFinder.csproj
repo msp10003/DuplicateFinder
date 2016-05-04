@@ -59,10 +59,12 @@
     <Compile Include="NameParser.cs" />
     <Compile Include="DataRetriever.cs" />
     <Compile Include="Cluster.cs" />
+    <Compile Include="NGramHashMap.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Record.cs" />
     <Compile Include="RowMapper.cs" />
+    <Compile Include="SimilarityComparer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
