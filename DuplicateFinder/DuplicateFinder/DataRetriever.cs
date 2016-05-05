@@ -14,6 +14,7 @@ namespace DuplicateFinder
         private String spreadSheetPath, nameColumn, claimNumColumn, claimDateColumn, descriptionCol;
         private SLDocument excelFile;
         public int numCols, numRows;
+        private const int NUM_ROWS_OFFSET = 2;
         private List<SLCellPointRange> rows;
 
         public DataRetriever(String pathName, String nameCol, String claimNumCol, String claimDateCol, String descCol)
@@ -25,7 +26,8 @@ namespace DuplicateFinder
             claimDateColumn = claimDateCol;
             descriptionCol = descCol;
             numCols = 1;
-            numRows = 1;
+            //TODO probably don't want to hardcode this in
+            numRows = NUM_ROWS_OFFSET;
         }
 
         public SLDocument setSpreadsheet(String pathName)
@@ -112,5 +114,9 @@ namespace DuplicateFinder
             return cpr.StartRowIndex;
         }
 
+        public int getNumRowsOffset()
+        {
+            return NUM_ROWS_OFFSET;
+        }
     }
 }

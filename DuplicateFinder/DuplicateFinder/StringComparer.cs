@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace DuplicateFinder
 {
-    class SimilarityComparer
+    class StringComparer
     {
         //TODO
         /*

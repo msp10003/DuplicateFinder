@@ -16,6 +16,7 @@ namespace DuplicateFinder
         private Int64 claimNumber;
         private int recordID;
         public List<String> nGrams;
+        private Cluster cluster;
 
         public Record(int ID, String last, String first, String middle, DateTime date, Int64 claimNum, string desc)
         {
@@ -34,6 +35,11 @@ namespace DuplicateFinder
         public String getFullName()
         {
             return fullName;
+        }
+
+        public int getID()
+        {
+            return recordID;
         }
 
         public String getFirstName()
@@ -59,6 +65,16 @@ namespace DuplicateFinder
         public String getKey()
         {
             return key;
+        }
+
+        public Cluster getCluster()
+        {
+            return cluster;
+        }
+
+        public void setCluster(Cluster c)
+        {
+            cluster = c;
         }
 
         public override string ToString()

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DuplicateFinder
 {
-    class NGramHashMap
+    class RecordComparer
     {
 
     }

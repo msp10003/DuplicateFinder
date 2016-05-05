@@ -10,7 +10,7 @@ namespace DuplicateFinder
 {
     class RowMapper
     {
-        NameParser parser;
+        private NameParser parser;
 
         public RowMapper()
         {
