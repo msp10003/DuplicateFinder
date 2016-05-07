@@ -56,6 +56,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataSet.cs" />
+    <Compile Include="ListPQ.cs" />
+    <Compile Include="ListPQNode.cs" />
     <Compile Include="NameParser.cs" />
     <Compile Include="DataRetriever.cs" />
     <Compile Include="Cluster.cs" />

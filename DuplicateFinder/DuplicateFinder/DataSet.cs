@@ -61,7 +61,7 @@ namespace DuplicateFinder
             {
                 Console.Out.Write(c.ToString());
             }
-
+            //test if adding third record to the 2nd element of the set R2 will detect that R1 and R3 are connected
             
         }
 
@@ -79,6 +79,11 @@ namespace DuplicateFinder
         {
             dictEnum.MoveNext();
             return dictEnum.Current.Value;
+        }
+
+        public List<Cluster> getClusters()
+        {
+            return clusters;
         }
         
         public bool MoveNext()
