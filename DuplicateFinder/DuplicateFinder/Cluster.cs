@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DuplicateFinder
 {
-    class Cluster
+    public class Cluster
     {
         private List<Record> records, subset;
         private String clusterName { get; set; }

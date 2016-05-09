@@ -2,7 +2,7 @@
 //TODO make this a private class
 namespace DuplicateFinder
 {
-    class ListPQNode<Item>
+    public class ListPQNode<Item>
     {
         public ListPQNode<Item> next;
         public ListPQNode<Item> prev;

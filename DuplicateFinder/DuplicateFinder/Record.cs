@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace DuplicateFinder
 {
-    class Record
+    public class Record
     {
         //TODO: use get and set syntax
         private String firstName, lastName, middleName, description, fullName, key;

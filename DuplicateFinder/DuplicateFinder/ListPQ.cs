@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DuplicateFinder
 {
-    class ListPQ<Cluster> : IEnumerable<ListPQNode<Cluster>>
+    public class ListPQ<Cluster> : IEnumerable<ListPQNode<Cluster>>
     {
         private ListPQNode<Cluster> head;
         private ListPQNode<Cluster> tail;
@@ -64,6 +64,16 @@ namespace DuplicateFinder
             head.next = n;
             n.prev = head;
             head = n;
+        }
+
+        public Cluster peekTop()
+        {
+            return head.getValue();
+        }
+
+        public Cluster peekBottom()
+        {
+            return tail.getValue();
         }
 
         public IEnumerator<ListPQNode<Cluster>> GetEnumerator()
