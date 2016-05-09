@@ -3,7 +3,10 @@
  * */
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
+
+
 namespace DuplicateFinder
 {
     class DataSet
@@ -17,6 +20,8 @@ namespace DuplicateFinder
         private UnionFind unionFind;
         private List<Cluster> clusters;
 
+
+        //TODO !!! see if i can reduce how many times we take the rows of data and iterate through them
         public DataSet(DataRetriever dataRetriever)
         {
             data = dataRetriever;
@@ -29,7 +34,7 @@ namespace DuplicateFinder
             unionFind = new UnionFind(numRecords, data.getNumRowsOffset());
             clusters = new List<Cluster>();
 
-            //fill the trees, fill the union-find structure
+            //fill the trees, which will sort them fill the union-find structure
             foreach(Record r in records)
             {
                 Console.SetBufferSize(500, 600);
@@ -39,9 +44,8 @@ namespace DuplicateFinder
                 clusters.Add(cluster);
                 unionFind.initialInsert(r);
             }
-
             initEnum();
-
+            /*
             for(int i=0; i<100; i++)
             {
                 MoveNext();
@@ -54,7 +58,7 @@ namespace DuplicateFinder
             Cluster oldCluster = r2.getCluster();
             r1.getCluster().merge(r2.getCluster());
             clusters.Remove(oldCluster);
-
+            
 
             //Testing purposes
             foreach (Cluster c in clusters)
@@ -62,6 +66,7 @@ namespace DuplicateFinder
                 Console.Out.Write(c.ToString());
             }
             //test if adding third record to the 2nd element of the set R2 will detect that R1 and R3 are connected
+            */
             
         }
 
@@ -85,7 +90,28 @@ namespace DuplicateFinder
         {
             return clusters;
         }
+
+        public void addCluster(Cluster c)
+        {
+            clusters.Add(c);
+        }
         
+        //TODO find a way to do this without this brute force way
+        public List<Record> getRows()
+        {
+            return lastNameTree.Values.ToList();
+        }
+
+        public void associateRecords(Record r1, Record r2)
+        {
+            unionFind.union(r1, r2);
+        }
+
+        public bool recordsAssociated(Record r1, Record r2)
+        {
+            return unionFind.connected(r1, r2);
+        }
+
         public bool MoveNext()
         {
             return dictEnum.MoveNext();
@@ -102,5 +128,6 @@ namespace DuplicateFinder
             initEnum();
             return s;
         }
+
     }
 }

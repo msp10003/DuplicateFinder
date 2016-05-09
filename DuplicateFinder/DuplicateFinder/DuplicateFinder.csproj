@@ -56,6 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataSet.cs" />
+    <Compile Include="DuplicatePruner.cs" />
     <Compile Include="ListPQ.cs" />
     <Compile Include="ListPQNode.cs" />
     <Compile Include="NameParser.cs" />

@@ -8,7 +8,7 @@ namespace DuplicateFinder
 {
     class Cluster
     {
-        private List<Record> records;
+        private List<Record> records, subset;
         private String clusterName { get; set; }
         private int clusterNum { get; set; }
 
@@ -18,6 +18,7 @@ namespace DuplicateFinder
             records.Add(r);
             clusterNum = r.getID();
             clusterName = "C" + r.getID();
+            subset = new List<Record>();
         }
 
         public void Add(Record r)
@@ -36,6 +37,11 @@ namespace DuplicateFinder
 
             clusterName = "C"+records[0].getID();
             clusterNum = records[0].getID();
+        }
+
+        public List<Record> getRecords()
+        {
+            return records;
         }
 
         public override string ToString()

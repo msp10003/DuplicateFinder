@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DuplicateFinder
 {
-    class ListPQ<Cluster> : IEnumerable<Cluster>
+    class ListPQ<Cluster> : IEnumerable<ListPQNode<Cluster>>
     {
         private ListPQNode<Cluster> head;
         private ListPQNode<Cluster> tail;
@@ -53,12 +53,25 @@ namespace DuplicateFinder
             N--;
         }
 
-        public IEnumerator<Cluster> GetEnumerator()
+        public void setMax(ListPQNode<Cluster> n)
+        {
+            ListPQNode<Cluster> left = n.prev;
+            ListPQNode<Cluster> right = n.next;
+            left.next = right;
+            right.prev = left;
+
+            //set selected node to max
+            head.next = n;
+            n.prev = head;
+            head = n;
+        }
+
+        public IEnumerator<ListPQNode<Cluster>> GetEnumerator()
         {
             ListPQNode<Cluster> current = head;
             while(current != null)
             {
-                yield return current.getValue();
+                yield return current;
                 current = current.prev;
             }
         }
