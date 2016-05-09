@@ -18,16 +18,16 @@ namespace DuplicateFinder
             M = max;
         }
 
-        public void insertMax(Cluster r)
+        public void insertMax(Cluster c)
         {
             if (N == 0)
             {
-                head = new ListPQNode<Cluster>(r);
+                head = new ListPQNode<Cluster>(c);
                 tail = head;
                 N++;
                 return;
             }
-            ListPQNode<Cluster> n = new ListPQNode<Cluster>(r);
+            ListPQNode<Cluster> n = new ListPQNode<Cluster>(c);
             head.next = n;
             n.prev = head;
             head = n;
@@ -56,9 +56,10 @@ namespace DuplicateFinder
         public IEnumerator<Cluster> GetEnumerator()
         {
             ListPQNode<Cluster> current = head;
-            while(current.prev != null)
+            while(current != null)
             {
-                yield return current.prev.getValue();
+                yield return current.getValue();
+                current = current.prev;
             }
         }
 
