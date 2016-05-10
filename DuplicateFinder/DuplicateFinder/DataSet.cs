@@ -12,7 +12,7 @@ namespace DuplicateFinder
     class DataSet
     {
         private DataRetriever data;
-        private SortedDictionary<String , Record> lastNameTree;
+        private SortedDictionary<String , Record> lastNameTree, reverseNameTree;
         private RowMapper mapper;
         private StringComparer simComp;
         private SortedDictionary<String, Record>.Enumerator dictEnum;
@@ -27,6 +27,7 @@ namespace DuplicateFinder
             data = dataRetriever;
             simComp = new StringComparer();
             lastNameTree = new SortedDictionary<String, Record>();
+            reverseNameTree = new SortedDictionary<String, Record>();
             mapper = new RowMapper();
             ICollection<Record> records = mapper.mapRows(data);
             //TODO ensure that the number of records is truly reflective of how many "RECORDS" we have, not counting first
@@ -39,6 +40,7 @@ namespace DuplicateFinder
             {
                 Console.SetBufferSize(500, 600);
                 lastNameTree.Add(r.getKey(), r);
+                reverseNameTree.Add(r.getReverseKey(), r);
                 Cluster cluster = new Cluster(r);
                 r.setCluster(cluster);
                 clusters.Add(cluster);
@@ -79,6 +81,11 @@ namespace DuplicateFinder
         public List<Record> getRows()
         {
             return lastNameTree.Values.ToList();
+        }
+
+        public List<Record> getReverseRows()
+        {
+            return reverseNameTree.Values.ToList();
         }
 
         public void associateRecords(Record r1, Record r2)

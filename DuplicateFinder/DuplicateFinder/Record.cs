@@ -5,13 +5,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DuplicateFinder
 {
     public class Record
     {
         //TODO: use get and set syntax
-        private String firstName, lastName, middleName, description, fullName, key;
+        private String firstName, lastName, middleName, description, fullName, reverseFullName, key, reverseKey;
         private DateTime claimDate;
         private Int64 claimNumber;
         private int recordID;
@@ -28,8 +29,16 @@ namespace DuplicateFinder
             claimNumber = claimNum;
             description = desc;
             fullName = last + " " + first + " " + middle;
+            reverseFullName = reverseString(fullName);
             key = fullName + " " + recordID;
+            reverseKey = reverseFullName + " " + recordID;
             nGrams = new List<String>();
+        }
+
+        //TODO find a better place for this
+        private String reverseString(String input)
+        {
+            return new String(input.ToCharArray().Reverse().ToArray());
         }
 
         public String getFullName()
@@ -67,6 +76,10 @@ namespace DuplicateFinder
             return key;
         }
 
+        public String getReverseKey()
+        {
+            return reverseKey;
+        }
         public Cluster getCluster()
         {
             return cluster;

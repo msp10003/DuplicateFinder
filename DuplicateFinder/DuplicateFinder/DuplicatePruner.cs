@@ -22,11 +22,12 @@ namespace DuplicateFinder
         /// </summary>
         /// <param name="tolerance"></param>
         /// <param name="pqSize"></param>
-        public void prune(double tolerance, int pqSize)
+        public void prune(double tolerance, int pqSize, List<Record> sortedTree)
         {
             listPQ = new ListPQ<Cluster>(pqSize);
             //TODO figure out how to do this with an enumerator
-            List<Record> records = data.getRows();
+            //List<Record> records = data.getRows();
+            List<Record> records = sortedTree;
 
             //row-by-row traversal of data set
             foreach(Record current in records)

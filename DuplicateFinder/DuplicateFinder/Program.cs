@@ -12,7 +12,8 @@ namespace DuplicateFinder
             DataSet data = new DataSet(dataRetriever);
             DuplicatePruner pruner = new DuplicatePruner(data);
 
-            pruner.prune(0.6, 10);
+            pruner.prune(0.6, 10, data.getRows());
+            pruner.prune(0.6, 10, data.getReverseRows());
             List<Cluster> clusters = data.getClusters();
             
             Console.Read();
