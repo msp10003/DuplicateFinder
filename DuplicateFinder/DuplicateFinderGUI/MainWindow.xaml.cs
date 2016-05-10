@@ -28,11 +28,21 @@ namespace DuplicateFinderGUI
 
         private void Execute_Click(object sender, RoutedEventArgs e)
         {
-            Executor exec = new Executor();
+            Executor.execute();
             
         }
 
         private void Tolerance_Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+
+        }
+
+        private void Source_Spreadsheet_Path_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
 
         }

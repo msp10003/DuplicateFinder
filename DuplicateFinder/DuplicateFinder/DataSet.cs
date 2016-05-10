@@ -38,7 +38,7 @@ namespace DuplicateFinder
             //fill the trees, which will sort them fill the union-find structure
             foreach(Record r in records)
             {
-                Console.SetBufferSize(500, 600);
+                //Console.SetBufferSize(500, 600);
                 lastNameTree.Add(r.getKey(), r);
                 reverseNameTree.Add(r.getReverseKey(), r);
                 Cluster cluster = new Cluster(r);
