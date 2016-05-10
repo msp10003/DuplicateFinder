@@ -29,7 +29,9 @@ namespace DuplicateFinder
         public void merge(Cluster cluster)
         {
             //TODO do this more efficiently, this is horrible, ruins the benefits of union-find
-            foreach(Record r in cluster.records)
+            List<Record> origRecords = cluster.getRecords();
+
+            foreach(Record r in origRecords)
             {
                 r.setCluster(this);
                 this.records.Add(r);

@@ -24,6 +24,23 @@ namespace DuplicateFinder
         //TODO use a hashtable here
         public double nGramCompare(Record r1, Record r2)
         {
+            //handle numbers
+            int x, y;
+            if (Int32.TryParse(r1.getFullName(),out x) && Int32.TryParse(r2.getFullName(), out y))
+            {
+                if (x == y)
+                {
+                    return 0.999;
+                }
+                else
+                {
+                    return 0.00;
+                }
+            }
+            else if(Int32.TryParse(r1.getFullName(), out x) || Int32.TryParse(r2.getFullName(), out y))
+            {
+                return 0.00;
+            }
             var result = r1.nGrams.Intersect(r2.nGrams);
             double rc = result.Count();
             double r1c = r1.nGrams.Count();

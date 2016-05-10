@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -74,6 +75,11 @@ namespace DuplicateFinder
         public Cluster peekBottom()
         {
             return tail.getValue();
+        }
+
+        public int Count()
+        {
+            return N;
         }
 
         public IEnumerator<ListPQNode<Cluster>> GetEnumerator()

@@ -19,7 +19,7 @@ namespace DuplicateFinder
         private int numRecords;
         private UnionFind unionFind;
         private List<Cluster> clusters;
-
+        private int enumCount;
 
         //TODO !!! see if i can reduce how many times we take the rows of data and iterate through them
         public DataSet(DataRetriever dataRetriever)
@@ -44,16 +44,13 @@ namespace DuplicateFinder
                 clusters.Add(cluster);
                 unionFind.initialInsert(r);
             }
+            //TODO reverse sort the list
             initEnum();            
         }
 
         private void initEnum()
         {
             dictEnum = lastNameTree.GetEnumerator();
-            dictEnum.MoveNext();
-            dictEnum.MoveNext();
-            dictEnum.MoveNext();
-            dictEnum.MoveNext();
             dictEnum.MoveNext();
         }
 
@@ -98,12 +95,13 @@ namespace DuplicateFinder
         {
             return dictEnum.MoveNext();
         }
-
+        
+        //TODO change wording
         public void mergeClusters(Cluster existingCluster, Cluster newCluster)
         {
             Cluster oldCluster = existingCluster;
             existingCluster.merge(newCluster);
-            clusters.Remove(oldCluster);
+            clusters.Remove(newCluster);
         }
 
         public override string ToString()

@@ -25,11 +25,13 @@ namespace DuplicateFinder
         public void prune(double tolerance, int pqSize)
         {
             listPQ = new ListPQ<Cluster>(pqSize);
+            //TODO figure out how to do this with an enumerator
+            List<Record> records = data.getRows();
 
             //row-by-row traversal of data set
-            while (true)
+            foreach(Record current in records)
             {
-                Record current = data.getCurrent();
+                //Record current = data.getCurrent();
 
                 //first check if the record's cluster is already on the PQ
                 if (searchPQ(current))
@@ -37,15 +39,26 @@ namespace DuplicateFinder
                     continue;       //if  yes, move on to the next record
                 }
                 else
-                {       //search for membership in each cluster of the PQ
+                {   //if PQ is empty, add this cluster
+                    if(listPQ.Count() == 0)
+                    {
+                        listPQ.insertMax(current.getCluster());
+                        continue;
+                    }
+                    
+                    //search for membership in each cluster of the PQ
                     foreach(ListPQNode<Cluster> node in listPQ)
                     {
                         Cluster cluster = node.getValue();
-                        compareRecordToCluster(current, cluster, tolerance);
+                        if (compareRecordToCluster(current, cluster, tolerance))
+                        {
+                            break;  //if match, stop
+                        }
+                        //if no match, keep looking
                     }
                 }
 
-                if (data.MoveNext() == false) break;
+                //if (data.MoveNext() == false) break;
             }
 
 
@@ -65,7 +78,7 @@ namespace DuplicateFinder
                 double similarity = strComp.nGramCompare(queryRecord, r);
                 if(similarity >= tolerance)
                 {   //if yes, update the cluster
-                    addRecordToCluster(r, cluster);
+                    addRecordToCluster(queryRecord, cluster);
                     updatePQ(cluster);         //and update the priority queue
                     result = true;
                     break; 
