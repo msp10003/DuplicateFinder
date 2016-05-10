@@ -17,7 +17,12 @@ namespace DuplicateFinder
             strComp = new StringComparer();
         }
 
-        public void prune(double tolerance, int windowSize, int pqSize)
+        /// <summary>
+        /// Main kickoff method for the duplicate matching algorithm
+        /// </summary>
+        /// <param name="tolerance"></param>
+        /// <param name="pqSize"></param>
+        public void prune(double tolerance, int pqSize)
         {
             listPQ = new ListPQ<Cluster>(pqSize);
 
@@ -32,8 +37,12 @@ namespace DuplicateFinder
                     continue;       //if  yes, move on to the next record
                 }
                 else
-                {
-
+                {       //search for membership in each cluster of the PQ
+                    foreach(ListPQNode<Cluster> node in listPQ)
+                    {
+                        Cluster cluster = node.getValue();
+                        compareRecordToCluster(current, cluster, tolerance);
+                    }
                 }
 
                 if (data.MoveNext() == false) break;
@@ -42,12 +51,56 @@ namespace DuplicateFinder
 
         }
 
-        private void compareRecords(Record r1, Record r2)
+        /// <summary>
+        /// Checks whether a record belongs in a cluster using string comparison
+        /// </summary>
+        /// <param name="r"></param>
+        /// <param name="c"></param>
+        /// <returns></returns>
+        private bool compareRecordToCluster(Record queryRecord, Cluster cluster, double tolerance)
         {
-            Cluster r1Clust = r1.getCluster();
-            Cluster r2Clust = r2.getCluster();
+            bool result = false;
+            foreach(Record r in cluster.getRecords())
+            {   //check if record is similar enough to record in cluster to be added
+                double similarity = strComp.nGramCompare(queryRecord, r);
+                if(similarity >= tolerance)
+                {   //if yes, update the cluster
+                    addRecordToCluster(r, cluster);
+                    updatePQ(cluster);         //and update the priority queue
+                    result = true;
+                    break; 
+                }
+                else if(similarity < 0.2)    //if the similarity is way off, don't bother checking the rest of the cluster
+                {
+                    break;
+                }
+            }
+            //if we've looked through all the cluster records with no luck, this must belong to its own cluster, so just update PQ
+            updatePQ(queryRecord.getCluster());
 
+            return result;
+        }
 
+        /// <summary>
+        /// Adds the record to the given cluster and updates the underlying clusters collection
+        /// </summary>
+        /// <param name="record"></param>
+        /// <param name="cluster"></param>
+        private void addRecordToCluster(Record record, Cluster cluster)
+        {
+            //first update the union-find structure
+            data.associateRecords(record, cluster.getRepresentativeElement());
+            //then update the clusters
+            data.mergeClusters(cluster, record.getCluster());
+        }
+
+        /// <summary>
+        /// Updates the PQ with the given cluster
+        /// </summary>
+        /// <param name="c"></param>
+        private void updatePQ(Cluster c)
+        {
+            listPQ.insertMax(c);
         }
 
         /// <summary>

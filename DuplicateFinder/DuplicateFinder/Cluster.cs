@@ -44,6 +44,11 @@ namespace DuplicateFinder
             return records;
         }
 
+        public Record getRepresentativeElement()
+        {
+            return records[0];
+        }
+
         public override string ToString()
         {
             string s = "";

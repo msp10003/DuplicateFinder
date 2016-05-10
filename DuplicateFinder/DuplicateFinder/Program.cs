@@ -10,7 +10,9 @@ namespace DuplicateFinder
         {
             DataRetriever dataRetriever = new DataRetriever("C:\\Users\\Matthew\\Documents\\Duplicate Project\\Sample2.xlsx", "C", null, "I", "J");
             DataSet data = new DataSet(dataRetriever);
-            //System.Console.Out.Write(data.ToString());
+            DuplicatePruner pruner = new DuplicatePruner(data);
+
+            pruner.prune(0.6, 4);
             List<Cluster> clusters = data.getClusters();
             
             Console.Read();

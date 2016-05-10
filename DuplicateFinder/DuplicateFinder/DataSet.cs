@@ -33,7 +33,7 @@ namespace DuplicateFinder
             numRecords = records.Count;
             unionFind = new UnionFind(numRecords, data.getNumRowsOffset());
             clusters = new List<Cluster>();
-
+            //dictEnum = new SortedDictionary<string, Record>.Enumerator();
             //fill the trees, which will sort them fill the union-find structure
             foreach(Record r in records)
             {
@@ -44,35 +44,17 @@ namespace DuplicateFinder
                 clusters.Add(cluster);
                 unionFind.initialInsert(r);
             }
-            initEnum();
-            /*
-            for(int i=0; i<100; i++)
-            {
-                MoveNext();
-            }
-            Record r1 = getCurrent();
-            Record r2 = getNext();
-            Record r3 = getNext();
-
-            unionFind.union(r1, r2);
-            Cluster oldCluster = r2.getCluster();
-            r1.getCluster().merge(r2.getCluster());
-            clusters.Remove(oldCluster);
-            
-
-            //Testing purposes
-            foreach (Cluster c in clusters)
-            {
-                Console.Out.Write(c.ToString());
-            }
-            //test if adding third record to the 2nd element of the set R2 will detect that R1 and R3 are connected
-            */
-            
+            initEnum();            
         }
 
         private void initEnum()
         {
             dictEnum = lastNameTree.GetEnumerator();
+            dictEnum.MoveNext();
+            dictEnum.MoveNext();
+            dictEnum.MoveNext();
+            dictEnum.MoveNext();
+            dictEnum.MoveNext();
         }
 
         public Record getCurrent()
@@ -115,6 +97,13 @@ namespace DuplicateFinder
         public bool MoveNext()
         {
             return dictEnum.MoveNext();
+        }
+
+        public void mergeClusters(Cluster existingCluster, Cluster newCluster)
+        {
+            Cluster oldCluster = existingCluster;
+            existingCluster.merge(newCluster);
+            clusters.Remove(oldCluster);
         }
 
         public override string ToString()
