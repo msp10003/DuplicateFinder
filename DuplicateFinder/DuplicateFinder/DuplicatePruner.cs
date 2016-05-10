@@ -32,6 +32,7 @@ namespace DuplicateFinder
             foreach(Record current in records)
             {
                 //Record current = data.getCurrent();
+                bool inPQ = false;
 
                 //first check if the record's cluster is already on the PQ
                 if (searchPQ(current))
@@ -50,11 +51,16 @@ namespace DuplicateFinder
                     foreach(ListPQNode<Cluster> node in listPQ)
                     {
                         Cluster cluster = node.getValue();
-                        if (compareRecordToCluster(current, cluster, tolerance))
+                        if (compareRecordToCluster(current, cluster, tolerance, node))
                         {
+                            inPQ = true;
                             break;  //if match, stop
                         }
                         //if no match, keep looking
+                    }
+                    if (inPQ == false)
+                    {
+                        insertPQ(current.getCluster());
                     }
                 }
 
@@ -70,7 +76,7 @@ namespace DuplicateFinder
         /// <param name="r"></param>
         /// <param name="c"></param>
         /// <returns></returns>
-        private bool compareRecordToCluster(Record queryRecord, Cluster cluster, double tolerance)
+        private bool compareRecordToCluster(Record queryRecord, Cluster cluster, double tolerance, ListPQNode<Cluster> node)
         {
             bool result = false;
             foreach(Record r in cluster.getRecords())
@@ -79,7 +85,7 @@ namespace DuplicateFinder
                 if(similarity >= tolerance)
                 {   //if yes, update the cluster
                     addRecordToCluster(queryRecord, cluster);
-                    updatePQ(cluster);         //and update the priority queue
+                    updatePQ(node);         //and update the priority queue
                     result = true;
                     break; 
                 }
@@ -88,8 +94,8 @@ namespace DuplicateFinder
                     break;
                 }
             }
-            //if we've looked through all the cluster records with no luck, this must belong to its own cluster, so just update PQ
-            updatePQ(queryRecord.getCluster());
+            //if we've looked through all the cluster records with no luck, this must belong to its own cluster, so add it to PQ
+            //insertPQ(queryRecord.getCluster());
 
             return result;
         }
@@ -110,8 +116,13 @@ namespace DuplicateFinder
         /// <summary>
         /// Updates the PQ with the given cluster
         /// </summary>
-        /// <param name="c"></param>
-        private void updatePQ(Cluster c)
+        /// <param name="node"></param>
+        private void updatePQ(ListPQNode<Cluster> node)
+        {
+            listPQ.setMax(node);
+        }
+
+        private void insertPQ(Cluster c)
         {
             listPQ.insertMax(c);
         }

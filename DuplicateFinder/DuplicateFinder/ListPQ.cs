@@ -56,10 +56,22 @@ namespace DuplicateFinder
 
         public void setMax(ListPQNode<Cluster> n)
         {
-            ListPQNode<Cluster> left = n.prev;
-            ListPQNode<Cluster> right = n.next;
-            left.next = right;
-            right.prev = left;
+            if (N == 1 || head == n)
+            {
+                return;
+            }
+            else if(tail == n)
+            {
+                tail = n.next;
+                tail.prev = null;
+            }
+            else
+            {
+                ListPQNode<Cluster> left = n.prev;
+                ListPQNode<Cluster> right = n.next;
+                left.next = right;
+                right.prev = left;
+            }
 
             //set selected node to max
             head.next = n;
