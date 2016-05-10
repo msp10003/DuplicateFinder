@@ -4,11 +4,11 @@ using SpreadsheetLight;
 
 namespace DuplicateFinder
 {
-    class Program
+    public class Executor
     {
         static void Main(string[] args)
         {
-            DataRetriever dataRetriever = new DataRetriever("C:\\Users\\Matthew\\Documents\\Duplicate Project\\Sample4.xlsx", "C", null, "I", "J");
+            DataRetriever dataRetriever = new DataRetriever("C:\\Users\\mpierce\\Duplicate Project\\Sample2.xlsx", "C", null, "I", "J");
             DataSet data = new DataSet(dataRetriever);
             DuplicatePruner pruner = new DuplicatePruner(data);
 
