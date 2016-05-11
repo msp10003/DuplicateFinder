@@ -28,7 +28,7 @@ namespace DuplicateFinder
             claimDate = date;
             claimNumber = claimNum;
             description = desc;
-            fullName = last + " " + first + " " + middle;
+            fullName = createFullName();
             reverseFullName = reverseString(fullName);
             key = fullName + " " + recordID;
             reverseKey = reverseFullName + " " + recordID;
@@ -39,6 +39,24 @@ namespace DuplicateFinder
         private String reverseString(String input)
         {
             return new String(input.ToCharArray().Reverse().ToArray());
+        }
+
+        private String createFullName()
+        {
+            String s = "";
+            if (!String.IsNullOrEmpty(lastName))
+            {
+                s = lastName;
+            }
+            if (!String.IsNullOrEmpty(firstName))
+            {
+                s = s +" " + firstName;
+            }
+            if (!String.IsNullOrEmpty(middleName))
+            {
+                s = s + " " + middleName;
+            }
+            return s;
         }
 
         public String getFullName()

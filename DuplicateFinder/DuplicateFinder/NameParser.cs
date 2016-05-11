@@ -90,10 +90,14 @@ namespace DuplicateFinder
             {   //if it's a num, just put the number in the last name
                 nameArray[0] = tokens[0];
             }
-            if (includesCommas && (tokens.Count >= 3)) //if the name includes commas, we will assume that we have the Last Name, First Name format
+            if (includesCommas) //if the name includes commas, we will assume that we have the Last Name, First Name format
             {
-                for(int i=0; i<3; i++)  //we only care about the 3 tokens, if there are more we ignore them
+                for(int i=0; i<tokens.Count; i++)  //we only care about the 3 tokens, if there are more we ignore them
                 {
+                    if(i >= 3)
+                    {
+                        break;
+                    }
                     nameArray[i] = tokens[i];
                 }
             }
@@ -104,15 +108,13 @@ namespace DuplicateFinder
                     nameArray[0] = tokens[0];
                 }
                 else if (tokens.Count == 2) {   //assume we have First Name <space> Last Name format
-                    for (int i = 0; i < 2; i++)
-                    {
-                        nameArray[i] = tokens[i];
-                    }
+                    nameArray[0] = tokens[1];   
+                    nameArray[1] = tokens[0];
                 }
                 else if (tokens.Count > 2)      //assume we have First Name <space> Middle Name <space> Last Name format
                 {
-                    nameArray[0] = tokens[0];
-                    nameArray[1] = tokens[2];
+                    nameArray[0] = tokens[2];
+                    nameArray[1] = tokens[0];
                     nameArray[2] = tokens[1];
                 }
             }

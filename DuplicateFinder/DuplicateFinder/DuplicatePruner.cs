@@ -32,6 +32,12 @@ namespace DuplicateFinder
             //row-by-row traversal of data set
             foreach(Record current in records)
             {
+                //testing
+                if(current.getID() == 95)
+                {
+                    int x = 1;
+                }
+                //
                 //Record current = data.getCurrent();
                 bool inPQ = false;
 
