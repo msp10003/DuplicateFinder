@@ -45,8 +45,7 @@ namespace DuplicateFinder
             double rc = result.Count();
             double r1c = r1.nGrams.Count();
             double r2c = r2.nGrams.Count();
-            double diff = (r2c - r1c)/2;
-            double similarity = (rc)/(r1c+diff);
+            double similarity = (rc*2)/(r1c+r2c);
             return similarity;
         }
     }

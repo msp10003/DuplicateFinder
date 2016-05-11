@@ -32,12 +32,6 @@ namespace DuplicateFinder
             //row-by-row traversal of data set
             foreach(Record current in records)
             {
-                //testing
-                if(current.getID() == 95)
-                {
-                    int x = 1;
-                }
-                //
                 //Record current = data.getCurrent();
                 bool inPQ = false;
 
@@ -89,6 +83,25 @@ namespace DuplicateFinder
             foreach(Record r in cluster.getRecords())
             {   //check if record is similar enough to record in cluster to be added
                 double similarity = strComp.nGramCompare(queryRecord, r);
+
+                //TODO this section is hideous
+                double firstNameDiff = 0.0;
+                double lastNameDiff = 0.0;
+                if (!String.IsNullOrEmpty(queryRecord.getFirstName()) && !String.IsNullOrEmpty(r.getFirstName())){
+                    firstNameDiff = queryRecord.getFirstName().Length - r.getFirstName().Length;
+                }
+                if(!String.IsNullOrEmpty(queryRecord.getLastName()) && !String.IsNullOrEmpty(r.getLastName()))
+                {
+                    lastNameDiff = queryRecord.getLastName().Length - r.getLastName().Length;
+                }
+                if (firstNameDiff > 2)
+                {
+                    similarity = similarity - (0.075 * firstNameDiff * similarity); 
+                }
+                if(lastNameDiff > 2)
+                {
+                    similarity = similarity - (0.075 * lastNameDiff * similarity);
+                }
                 if(similarity >= tolerance)
                 {   //if yes, update the cluster
                     addRecordToCluster(queryRecord, cluster);
