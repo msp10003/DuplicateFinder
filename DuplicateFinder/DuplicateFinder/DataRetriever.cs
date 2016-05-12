@@ -126,15 +126,11 @@ namespace DuplicateFinder
 
         public void copySpreadsheetToFile(String outputPath)
         {
-            SLDocument spreadsheet = new SLDocument();
-            for (int i = 1; i < numRows; i++)
-            {
-                for (int j = 1; j < numCols; j++)
-                {
-                    spreadsheet.SetCellValue(i, j, excelFile.GetCellValueAsString(i, j));
-                }
-            }
-            spreadsheet.SaveAs(outputPath);
+            excelFile.SaveAs(outputPath);
+            SLDocument duplicateExcelFile = new SLDocument(outputPath);
+            duplicateExcelFile.SetCellValue(2, 30, "TEST");
+            duplicateExcelFile.Save();
+            
         }
     }
 }
