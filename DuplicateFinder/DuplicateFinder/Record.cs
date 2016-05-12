@@ -74,6 +74,11 @@ namespace DuplicateFinder
             return firstName;
         }
 
+        public DateTime getDate()
+        {
+            return claimDate;
+        }
+
         public String getLastName()
         {
             return lastName;

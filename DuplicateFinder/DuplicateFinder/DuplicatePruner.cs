@@ -82,27 +82,36 @@ namespace DuplicateFinder
             bool result = false;
             foreach(Record r in cluster.getRecords())
             {   //check if record is similar enough to record in cluster to be added
-                double similarity = strComp.nGramCompare(queryRecord, r);
+                double similarity = strComp.nGramCompare(queryRecord, r);   //get initial similarity measure
+                if(queryRecord.getID() == 1171)
+                {
+                    int x = 0;
+                }
 
-                //TODO this section is hideous
-                double firstNameDiff = 0.0;
-                double lastNameDiff = 0.0;
-                if (!String.IsNullOrEmpty(queryRecord.getFirstName()) && !String.IsNullOrEmpty(r.getFirstName())){
-                    firstNameDiff = queryRecord.getFirstName().Length - r.getFirstName().Length;
-                }
-                if(!String.IsNullOrEmpty(queryRecord.getLastName()) && !String.IsNullOrEmpty(r.getLastName()))
+
+                calculateDeductions(queryRecord, r, similarity);            //apply deductions
+                
+                if(similarity < (tolerance+(tolerance*0.12))                //if the similarity is close around the tolerance, check the date
+                    && similarity > tolerance - (tolerance * 0.12))
                 {
-                    lastNameDiff = queryRecord.getLastName().Length - r.getLastName().Length;
+                    compareDates(queryRecord, r, similarity);
                 }
-                if (firstNameDiff > 2)
+
+                if (similarity < (tolerance + (tolerance * 0.12))            //if the similarity is still indecisive, check the description as a last resort
+                    && similarity > tolerance - (tolerance * 0.12))
                 {
-                    similarity = similarity - (0.075 * firstNameDiff * similarity); 
+                    double descSimilarity = strComp.nGramCompareDesc(queryRecord, r);
+                    if(descSimilarity > tolerance)
+                    {
+                        similarity = similarity + (similarity * 0.1);
+                    }
+                    else if(descSimilarity < (0.5) * tolerance)
+                    {
+                        similarity = similarity - (similarity * 0.3);
+                    }
                 }
-                if(lastNameDiff > 2)
-                {
-                    similarity = similarity - (0.075 * lastNameDiff * similarity);
-                }
-                if(similarity >= tolerance)
+
+                if (similarity >= tolerance)
                 {   //if yes, update the cluster
                     addRecordToCluster(queryRecord, cluster);
                     updatePQ(node);         //and update the priority queue
@@ -118,6 +127,72 @@ namespace DuplicateFinder
             //insertPQ(queryRecord.getCluster());
 
             return result;
+        }
+
+        /// <summary>
+        /// Takes into account various similarity deductions based on corner cases
+        /// </summary>
+        /// <param name="queryRecord"></param>
+        /// <param name="r"></param>
+        /// <param name="similarity"></param>
+        private void calculateDeductions(Record queryRecord, Record r, double similarity)
+        {
+            //TODO this section is hideous
+            double firstNameDiff = 0.0;
+            double lastNameDiff = 0.0;
+            //if the names differ in length by 3 or more characters, a deduction is in order
+            if (!String.IsNullOrEmpty(queryRecord.getFirstName()) && !String.IsNullOrEmpty(r.getFirstName()))
+            {
+                firstNameDiff = queryRecord.getFirstName().Length - r.getFirstName().Length;
+            }
+            if (!String.IsNullOrEmpty(queryRecord.getLastName()) && !String.IsNullOrEmpty(r.getLastName()))
+            {
+                lastNameDiff = queryRecord.getLastName().Length - r.getLastName().Length;
+            }
+            if (firstNameDiff > 2)
+            {
+                similarity = similarity - (0.075 * (firstNameDiff - 2) * similarity);
+            }
+            if (lastNameDiff > 2)
+            {
+                similarity = similarity - (0.075 * (lastNameDiff - 2) * similarity);
+            }
+
+            //put emphasis on the first letter of the last names
+            if(queryRecord.getLastName()[0] != r.getLastName()[0])
+            {
+                similarity = similarity - (0.1 * similarity);
+            }
+        }
+
+        /// <summary>
+        /// Compares similarity between the dates of the records in question
+        /// </summary>
+        /// <param name="queryRecord"></param>
+        /// <param name="r1"></param>
+        /// <param name="similarity"></param>
+        private void compareDates(Record queryRecord, Record r1, double similarity)
+        {
+            DateTime d1 = queryRecord.getDate();
+            DateTime d2 = r1.getDate();
+            if(d1.Year < 10)
+            {
+                d1.AddYears(2000);
+            }
+
+            if (d2.Year < 10)
+            {
+                d2.AddYears(2000);
+            }
+            double dateDiff = Math.Abs((d1 - d2).TotalDays);
+            if(dateDiff <= 2)
+            {
+                similarity = similarity + (similarity * 0.1);
+            }
+            else if(dateDiff >= 14)
+            {
+                similarity = similarity - (similarity * 0.1);
+            }
         }
 
         /// <summary>

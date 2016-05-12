@@ -13,15 +13,16 @@ namespace DuplicateFinder
 
         public static void execute()
         {
-            DataRetriever dataRetriever = new DataRetriever("C:\\Users\\Matthew\\Documents\\Duplicate Project\\Sample4.xlsx", "C", null, "I", "J");
+            DataRetriever dataRetriever = new DataRetriever("C:\\Users\\Matthew\\Documents\\Duplicate Project\\List 2.xlsx", "B", null, "D", "H");
             DataSet data = new DataSet(dataRetriever);
             DuplicatePruner pruner = new DuplicatePruner(data);
 
-            pruner.prune(0.6, 10, data.getRows());
+            pruner.prune(0.7, 10, data.getRows());
             List<Cluster> clusters1 = data.getClusters();
-            pruner.prune(0.6, 10, data.getReverseRows());
+            pruner.prune(0.7, 10, data.getReverseRows());
             List<Cluster> clusters2 = data.getClusters();
 
+            dataRetriever.copySpreadsheetToFile("C:\\Users\\Matthew\\Documents\\Duplicate Project\\TestOutput1.xlsx");
             //Console.Read();
         }
     }

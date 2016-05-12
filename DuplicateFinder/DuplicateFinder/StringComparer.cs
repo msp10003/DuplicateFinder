@@ -48,5 +48,19 @@ namespace DuplicateFinder
             double similarity = (rc*2)/(r1c+r2c);
             return similarity;
         }
+
+        public double nGramCompareDesc(Record r1, Record r2)
+        {
+            NameParser parser = new NameParser();
+            List<String> r1NGrams = parser.parseNGrams(r1.getDescription(), 3);
+            List<String> r2NGrams = parser.parseNGrams(r2.getDescription(), 3);
+            //TODO code reuse here
+            var result = r1NGrams.Intersect(r2NGrams);
+            double rc = result.Count();
+            double r1c = r1NGrams.Count;
+            double r2c = r2NGrams.Count;
+            double similarity = (rc * 2) / (r1c + r2c);
+            return similarity;
+        }
     }
 }
