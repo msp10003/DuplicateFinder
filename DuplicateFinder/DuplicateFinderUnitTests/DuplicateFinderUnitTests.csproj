@@ -54,6 +54,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="StringComparerTests.cs" />
     <Compile Include="ListPQTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -11,16 +11,42 @@ using System.Threading.Tasks;
 
 namespace DuplicateFinder
 {
-    class StringComparer
+    //TODO refactor all methods to take strings instead of records
+    public class StringComparer
     {
-        //TODO
-        /*
+        delegate int del();
+
         public double jaroWinklerCompare(Record r1, Record r2)
         {
+            return jaroWinklerCompare(r1.getFullName(), r2.getFullName());
+        }
 
-        }*/
+        public double jaroWinklerCompare(String s1, String s2)
+        {
+            String maxStr, minStr;
+            
+            if (s1.Length >= s2.Length)
+            {
+                maxStr = s1;
+                minStr = s2;
+            }
+            else
+            {
+                maxStr = s2;
+                minStr = s1;
+            }
 
-        //TODO Make this also work for description as well as name
+            int m = (maxStr.Length / 2) - 1;
+
+            for (int i = 0; i < maxStr.Length; i++)
+            {
+                del winMax = () => Math.Min(i+m, minStr.Length);
+                del winMin = () => Math.Max(i-m, 0);
+                Console.Out.WriteLine("min:" + winMin + "max:" + winMax);
+            }
+            return 0;
+        }
+
         //TODO use a hashtable here
         public double nGramCompare(Record r1, Record r2)
         {
