@@ -24,7 +24,7 @@ namespace DuplicateFinder
         public double jaroWinklerCompare(String s1, String s2)
         {
             String maxStr, minStr;
-            
+
             if (s1.Length >= s2.Length)
             {
                 maxStr = s1;
@@ -36,15 +36,92 @@ namespace DuplicateFinder
                 minStr = s1;
             }
 
-            int m = (maxStr.Length / 2) - 1;
+            int w = (maxStr.Length / 2) - 1;
+            int t = 0;
+            int m = 0;
+            char[] matches1 = new char[maxStr.Length];
+            char[] matches2 = new char[maxStr.Length];
+            double dj, dw;
+            int l = 0;
 
+            //first get the matches
             for (int i = 0; i < maxStr.Length; i++)
             {
-                del winMax = () => Math.Min(i+m, minStr.Length);
-                del winMin = () => Math.Max(i-m, 0);
-                Console.Out.WriteLine("min:" + winMin + "max:" + winMax);
+                del winMax = () => { return Math.Min(i + w, minStr.Length-1); };
+                del winMin = () => { return Math.Max(i - w, 0); };
+                int z = winMax();
+
+                //TODO improve speed by starting at i and checking to left and right simultaneously
+                //the reasoning being that most of the time that match will be at i
+                for (int j = winMin(); j < winMax()+1; j++)
+                {
+                    if (minStr[j] == maxStr[i])
+                    {
+                        matches1[i] = maxStr[i];
+                        matches2[j] = minStr[j];
+                        m++;
+                        break;
+                    }
+                }
+
             }
-            return 0;
+
+            char[] matches1Normalized = new char[matches1.Length];
+            char[] matches2Normalized = new char[matches2.Length];
+            int m1nIndex= 0;
+            int m2nIndex = 0;
+            for (int i = 0; i < matches1.Length; i++)
+            {
+                if (matches1[i] !=  '\0')
+                {
+                    matches1Normalized[m1nIndex] = matches1[i];
+                    m1nIndex++;
+                }
+                if (matches2[i] != '\0')
+                {
+                    matches2Normalized[m2nIndex] = matches2[i];
+                    m2nIndex++;
+                }
+            }
+
+            //next get the transpositions
+            for (int i = 0; i < m; i++)
+            {
+                if (matches1Normalized[i] != matches2Normalized[i])
+                {
+                    t++;
+                }
+            }
+            //get transposition count
+            t = (t / 2);
+
+            //calculate the length of the opening substring
+            for (int i = 0; i < minStr.Length; i++)
+            {
+                if (minStr[i] != maxStr[i])
+                {
+                    break;
+                }
+                l++;
+            }
+
+            //now calculate the jaro distance
+            if (m == 0)
+            {
+                dj = 0;
+            }
+            else
+            {
+                double firstTerm = (double) m /(double) maxStr.Length;
+                double secondTerm = (double) m /(double) minStr.Length;
+                double thirdTerm = ((double)m - (double)t) / (double) m;
+                dj = (1.0/3.0)*(firstTerm + secondTerm + thirdTerm);
+            }
+            
+            //and lastly calculate the Winkler factor
+            dw = dj + ((l * 0.1) * (1 - dj));
+            
+            return dw;
         }
 
         //TODO use a hashtable here

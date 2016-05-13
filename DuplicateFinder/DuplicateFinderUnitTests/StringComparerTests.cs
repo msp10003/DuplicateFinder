@@ -11,7 +11,7 @@ namespace DuplicateFinderUnitTests
         public void jaroWinklerTest()
         {
             DuplicateFinder.StringComparer strComp = new DuplicateFinder.StringComparer();
-            strComp.jaroWinklerCompare("Martha", "Marhta");
+            strComp.jaroWinklerCompare("DUANE", "DWAYNE");
         }
 
     }
