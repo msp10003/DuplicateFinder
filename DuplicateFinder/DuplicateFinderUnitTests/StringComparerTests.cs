@@ -11,7 +11,7 @@ namespace DuplicateFinderUnitTests
         public void jaroWinklerTest()
         {
             DuplicateFinder.StringComparer strComp = new DuplicateFinder.StringComparer();
-            strComp.jaroWinklerCompare("DUANE", "DWAYNE");
+            double sim = DuplicateFinder.StringComparer.proximity("CAARTER AMY", "CARTER AMY J");
         }
 
     }

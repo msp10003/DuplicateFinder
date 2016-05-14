@@ -82,32 +82,32 @@ namespace DuplicateFinder
             bool result = false;
             foreach(Record r in cluster.getRecords())
             {   //check if record is similar enough to record in cluster to be added
-                double similarity = strComp.nGramCompare(queryRecord, r);   //get initial similarity measure
-                if(queryRecord.getID() == 1171)
+
+                if (queryRecord.getID() == 120 && r.getID() == 119)
                 {
                     int x = 0;
                 }
+                double similarity = strComp.jaroWinklerCompare(queryRecord, r);   //get initial similarity measure
 
+                //calculateDeductions(queryRecord, r, similarity);            //apply deductions
 
-                calculateDeductions(queryRecord, r, similarity);            //apply deductions
-                
-                if(similarity < (tolerance+(tolerance*0.12))                //if the similarity is close around the tolerance, check the date
-                    && similarity > tolerance - (tolerance * 0.12))
+                if(similarity < (tolerance+(tolerance*0.07))                //if the similarity is close around the tolerance, check the date
+                    && similarity > tolerance - (tolerance * 0.07))
                 {
-                    compareDates(queryRecord, r, similarity);
+                    similarity = compareDates(queryRecord, r, similarity);
                 }
 
-                if (similarity < (tolerance + (tolerance * 0.12))            //if the similarity is still indecisive, check the description as a last resort
-                    && similarity > tolerance - (tolerance * 0.12))
+                if (similarity < (tolerance + (tolerance * 0.05))            //if the similarity is still indecisive, check the description as a last resort
+                    && similarity > tolerance - (tolerance * 0.05))
                 {
                     double descSimilarity = strComp.nGramCompareDesc(queryRecord, r);
                     if(descSimilarity > tolerance)
                     {
-                        similarity = similarity + (similarity * 0.1);
+                        similarity = similarity + (similarity * 0.08);
                     }
                     else if(descSimilarity < (0.5) * tolerance)
                     {
-                        similarity = similarity - (similarity * 0.3);
+                        similarity = similarity - (similarity * 0.15);
                     }
                 }
 
@@ -118,7 +118,7 @@ namespace DuplicateFinder
                     result = true;
                     break; 
                 }
-                else if(similarity < 0.2)    //if the similarity is way off, don't bother checking the rest of the cluster
+                else if(similarity < 0.5)    //if the similarity is way off, don't bother checking the rest of the cluster
                 {
                     break;
                 }
@@ -171,10 +171,14 @@ namespace DuplicateFinder
         /// <param name="queryRecord"></param>
         /// <param name="r1"></param>
         /// <param name="similarity"></param>
-        private void compareDates(Record queryRecord, Record r1, double similarity)
+        private double compareDates(Record queryRecord, Record r1, double similarity)
         {
             DateTime d1 = queryRecord.getDate();
             DateTime d2 = r1.getDate();
+            if(d1.Equals(new DateTime(1900,1,1)) || d2.Equals(new DateTime(1900, 1, 1))){
+                //one of the records didn't have a date, disregard this comparison
+                return similarity;
+            }
             if(d1.Year < 10)
             {
                 d1.AddYears(2000);
@@ -185,7 +189,11 @@ namespace DuplicateFinder
                 d2.AddYears(2000);
             }
             double dateDiff = Math.Abs((d1 - d2).TotalDays);
-            if(dateDiff <= 2)
+            if(dateDiff == 0)
+            {
+                similarity = similarity + (similarity * 0.2);
+            }
+            else if(dateDiff <= 2)
             {
                 similarity = similarity + (similarity * 0.1);
             }
@@ -193,6 +201,7 @@ namespace DuplicateFinder
             {
                 similarity = similarity - (similarity * 0.1);
             }
+            return similarity;
         }
 
         /// <summary>
