@@ -31,13 +31,18 @@ namespace DuplicateFinder
             fullName = createFullName();
             reverseFullName = reverseString(fullName);
             key = fullName + " " + recordID;
-            reverseKey = reverseFullName + " " + recordID;
+            //TODO account for if there is no first name (prevent that extra space from being added)
+            reverseKey = reverseString(firstName)+" "+reverseString(lastName) + " " + recordID;
             nGrams = new List<String>();
         }
 
         //TODO find a better place for this
         private String reverseString(String input)
         {
+            if (input == null)
+            {
+                return "";
+            }
             return new String(input.ToCharArray().Reverse().ToArray());
         }
 

@@ -6,6 +6,11 @@
 using System;
 using SpreadsheetLight;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Spreadsheet;
+using System.Drawing;
 
 namespace DuplicateFinder
 {
@@ -119,8 +124,28 @@ namespace DuplicateFinder
             return NUM_ROWS_OFFSET;
         }
 
-        public void writeToFile(List<String> records, SLDocument targetFile)
+        public void writeDuplicates(List<Cluster> clusters, String pathName)
         {
+            SLDocument targetFile = new SLDocument(pathName);
+            foreach (Cluster c in clusters)
+            {
+                List<Record> records = c.getRecords();
+                if (records.Count < 2)
+                {
+                    continue;
+                }
+                for(int i=1; i<records.Count; i++)
+                { 
+                    SLStyle style = targetFile.CreateStyle();
+                    style.Fill.SetPattern(PatternValues.Solid, System.Drawing.Color.Red, System.Drawing.Color.Blue);
+
+                    //highlight the possible duplicates in red
+                    targetFile.SetCellStyle(records[i].getID(), 1, records[i].getID(), numCols, style); 
+                    targetFile.SetCellValue(records[i].getID(), numCols, "Possible duplicate of Row #" + records[0].getID() + " , Claimant " + records[0].getFullName());
+                    
+                }
+            }
+            targetFile.Save();
 
         }
 
@@ -128,7 +153,6 @@ namespace DuplicateFinder
         {
             excelFile.SaveAs(outputPath);
             SLDocument duplicateExcelFile = new SLDocument(outputPath);
-            duplicateExcelFile.SetCellValue(2, 30, "TEST");
             duplicateExcelFile.Save();
             
         }
