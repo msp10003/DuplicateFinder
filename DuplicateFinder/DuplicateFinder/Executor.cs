@@ -11,7 +11,7 @@ namespace DuplicateFinder
 
         }
 
-        public static void execute()
+        public static void execute(String inputPath, String outputPath, String nameCol, String IDCol, String dateCol, String descCol)
         {
             DataRetriever dataRetriever = new DataRetriever("C:\\Users\\mpierce\\Duplicate Project\\Sample2.xlsx", "C", null, "F", "J");
             DataSet data = new DataSet(dataRetriever);

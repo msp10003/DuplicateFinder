@@ -28,7 +28,7 @@ namespace DuplicateFinderGUI
 
         private void Execute_Click(object sender, RoutedEventArgs e)
         {
-            Executor.execute();
+            Executor.execute(Source_Spreadsheet_Path.Text, Destination_Spreadsheet_Path.Text,"","","","");
             
         }
 
@@ -42,7 +42,12 @@ namespace DuplicateFinderGUI
 
         }
 
-        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void Destination_Spreadsheet_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
 
         }

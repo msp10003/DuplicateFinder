@@ -9,6 +9,23 @@ namespace DuplicateFinder
 {
     class NameParser
     {
+        public String parseFilePath(String input)
+        {
+	        String pathName = "";
+	
+	        foreach(Char c in input.ToCharArray()){
+		        if((c == '\\') || (c == '/'))
+                {
+			        pathName += "\\";
+		        }
+                else
+                {
+			        pathName += c;
+		        }
+	        }
+
+            return pathName;
+        }   
         /// <summary>
         /// Parses a name from a string
         /// </summary>
