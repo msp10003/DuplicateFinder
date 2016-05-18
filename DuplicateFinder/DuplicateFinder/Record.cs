@@ -19,14 +19,14 @@ namespace DuplicateFinder
         public List<String> nGrams;
         private Cluster cluster;
 
-        public Record(int ID, String last, String first, String middle, DateTime date, Int64 claimNum, string desc)
+        public Record(int ID, String last, String first, String middle, DateTime date, string desc)
         {
             recordID = ID;
             firstName = first;
             lastName = last;
             middleName = middle;
             claimDate = date;
-            claimNumber = claimNum;
+            //claimNumber = claimNum;
             description = desc;
             fullName = createFullName();
             reverseFullName = reverseString(fullName);

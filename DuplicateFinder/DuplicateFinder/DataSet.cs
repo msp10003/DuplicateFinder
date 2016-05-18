@@ -123,5 +123,10 @@ namespace DuplicateFinder
             return s;
         }
 
+        public int getNumRows()
+        {
+            return numRecords;
+        }
+
     }
 }

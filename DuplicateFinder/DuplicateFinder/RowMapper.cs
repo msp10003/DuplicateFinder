@@ -32,13 +32,13 @@ namespace DuplicateFinder
 
         private Record rowToRecord(SLCellPointRange cpr, DataRetriever dataRetriever)
         {
-            Int64 claimNum = dataRetriever.getClaimNum(cpr.StartRowIndex);
+            //Int64 claimNum = dataRetriever.getClaimNum(cpr.StartRowIndex);
             String claimDesc = dataRetriever.getDescription(cpr.StartRowIndex);
             DateTime claimDate = dataRetriever.getClaimDate(cpr.StartRowIndex);
             String name = dataRetriever.getName(cpr.StartRowIndex);
             String[] nameTokens = parser.parseName(name);
             int recordID = dataRetriever.getRowID(cpr);
-            Record r = new Record(recordID, nameTokens[0], nameTokens[1], nameTokens[2], claimDate, claimNum, claimDesc);
+            Record r = new Record(recordID, nameTokens[0], nameTokens[1], nameTokens[2], claimDate, claimDesc);
             //r.nGrams = parser.parseNGrams(r.getFullName(), 3);
             //r.nGrams = parser.parseRecordNGrams(r, 3);
             return r;

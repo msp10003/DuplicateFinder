@@ -22,17 +22,26 @@ namespace DuplicateFinder
         private const int NUM_ROWS_OFFSET = 2;
         private List<SLCellPointRange> rows;
 
-        public DataRetriever(String pathName, String nameCol, String claimNumCol, String claimDateCol, String descCol)
+        public DataRetriever(String pathName, String nameCol, String claimDateCol, String descCol)
         {
-            spreadSheetPath = pathName;
-            excelFile = new SLDocument(pathName);
-            nameColumn = nameCol;
-            claimNumColumn = claimNumCol;
-            claimDateColumn = claimDateCol;
-            descriptionCol = descCol;
-            numCols = 1;
-            //TODO probably don't want to hardcode this in
-            numRows = NUM_ROWS_OFFSET;
+            try
+            {
+                spreadSheetPath = pathName;
+                excelFile = new SLDocument(pathName);
+            }
+            catch
+            {
+                throw (new Exception("Could not find spreadsheet file"));
+            }
+            finally
+            {
+                nameColumn = nameCol;
+                claimDateColumn = claimDateCol;
+                descriptionCol = descCol;
+                numCols = 1;
+                //TODO probably don't want to hardcode this in
+                numRows = NUM_ROWS_OFFSET;
+            }
         }
 
         public SLDocument setSpreadsheet(String pathName)
@@ -41,12 +50,6 @@ namespace DuplicateFinder
             excelFile = new SLDocument(spreadSheetPath);
             return excelFile;
         }
-
-        /*public ExcelRow getRow(int rowNum)
-        {
-            SLCellPointRange cellRange = new SLCellPointRange()
-            return row;
-        }*/
 
         public SLDocument getExcelFile()
         {
@@ -151,9 +154,16 @@ namespace DuplicateFinder
 
         public void copySpreadsheetToFile(String outputPath)
         {
-            excelFile.SaveAs(outputPath);
-            SLDocument duplicateExcelFile = new SLDocument(outputPath);
-            duplicateExcelFile.Save();
+            try
+            {
+                excelFile.SaveAs(outputPath);
+                SLDocument duplicateExcelFile = new SLDocument(outputPath);
+                duplicateExcelFile.Save();
+            }
+            catch
+            {
+                throw (new Exception("The output file path does not exist"));
+            }
             
         }
     }
