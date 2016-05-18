@@ -24,51 +24,56 @@ namespace DuplicateFinder
         /// <param name="pqSize"></param>
         public void prune(double tolerance, int pqSize, List<Record> sortedTree)
         {
-            listPQ = new ListPQ<Cluster>(pqSize);
-            //TODO figure out how to do this with an enumerator
-            //List<Record> records = data.getRows();
-            List<Record> records = sortedTree;
-
-            //row-by-row traversal of data set
-            foreach(Record current in records)
+            try
             {
-                //Record current = data.getCurrent();
-                bool inPQ = false;
+                listPQ = new ListPQ<Cluster>(pqSize);
+                //TODO figure out how to do this with an enumerator
+                //List<Record> records = data.getRows();
+                List<Record> records = sortedTree;
 
-                //first check if the record's cluster is already on the PQ
-                if (searchPQ(current))
+                //row-by-row traversal of data set
+                foreach (Record current in records)
                 {
-                    continue;       //if  yes, move on to the next record
-                }
-                else
-                {   //if PQ is empty, add this cluster
-                    if(listPQ.Count() == 0)
+                    //Record current = data.getCurrent();
+                    bool inPQ = false;
+
+                    //first check if the record's cluster is already on the PQ
+                    if (searchPQ(current))
                     {
-                        listPQ.insertMax(current.getCluster());
-                        continue;
+                        continue;       //if  yes, move on to the next record
                     }
-                    
-                    //search for membership in each cluster of the PQ
-                    foreach(ListPQNode<Cluster> node in listPQ)
-                    {
-                        Cluster cluster = node.getValue();
-                        if (compareRecordToCluster(current, cluster, tolerance, node))
+                    else
+                    {   //if PQ is empty, add this cluster
+                        if (listPQ.Count() == 0)
                         {
-                            inPQ = true;
-                            break;  //if match, stop
+                            listPQ.insertMax(current.getCluster());
+                            continue;
                         }
-                        //if no match, keep looking
+
+                        //search for membership in each cluster of the PQ
+                        foreach (ListPQNode<Cluster> node in listPQ)
+                        {
+                            Cluster cluster = node.getValue();
+                            if (compareRecordToCluster(current, cluster, tolerance, node))
+                            {
+                                inPQ = true;
+                                break;  //if match, stop
+                            }
+                            //if no match, keep looking
+                        }
+                        if (inPQ == false)
+                        {
+                            insertPQ(current.getCluster());
+                        }
                     }
-                    if (inPQ == false)
-                    {
-                        insertPQ(current.getCluster());
-                    }
+
+                    //if (data.MoveNext() == false) break;
                 }
-
-                //if (data.MoveNext() == false) break;
             }
-
-
+            catch
+            {
+                throw (new Exception("Scanning Failed"));
+            }
         }
 
         /// <summary>

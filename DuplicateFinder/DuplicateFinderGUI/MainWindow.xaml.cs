@@ -25,6 +25,7 @@ namespace DuplicateFinderGUI
         public MainWindow()
         {
             InitializeComponent();
+           // System.Windows.Threading.Dispatcher.Run();
         }
 
         private void Execute_Click(object sender, RoutedEventArgs e)
@@ -49,9 +50,18 @@ namespace DuplicateFinderGUI
                     return;
                 }
 
+                if (!ValidateOverwrite())
+                {
+                    Alert_Text.Text = "The output file matches the input file, please select a different output file to avoid overwriting";
+                    Alert_Text.Foreground = Brushes.Red;
+                    Alert_Text.Visibility = Visibility.Visible;
+                    return;
+                }
+
                 String nameCol = Name_Column.Text;
                 String dateCol = Date_Column.Text;
                 String descCol = Description_Column.Text;
+                
                 Executor executor = new Executor();
                 executor.execute(Source_Spreadsheet_Path.Text, Destination_Spreadsheet_Path.Text, nameCol, dateCol, descCol);
 
@@ -112,6 +122,42 @@ namespace DuplicateFinderGUI
                 return false;
             }
             return true;
+        }
+
+        private bool ValidateOverwrite()
+        {
+            if (Destination_Spreadsheet_Path.Text == Source_Spreadsheet_Path.Text)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        private void File_Browser_Button_Click(object sender, RoutedEventArgs e)
+        {
+            // Create OpenFileDialog 
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            
+            // Set filter for file extension and default file extension 
+            dlg.DefaultExt = ".xlsx";
+            //dlg.Filter = "XLSX Files (*.xlsx)"; 
+
+            // Display OpenFileDialog by calling ShowDialog method 
+            Nullable<bool> result = dlg.ShowDialog();
+
+            // Get the selected file name and display in a TextBox 
+            if (result == true)
+            {
+                // Open document 
+                string filename = dlg.FileName;
+                Source_Spreadsheet_Path.Text = filename;
+            }
+
+        }
+
+        private void Scan_Progress_Bar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+
         }
     }
 }
