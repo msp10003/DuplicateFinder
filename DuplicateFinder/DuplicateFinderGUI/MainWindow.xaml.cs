@@ -63,7 +63,7 @@ namespace DuplicateFinderGUI
                 String descCol = Description_Column.Text;
                 
                 Executor executor = new Executor();
-                executor.execute(Source_Spreadsheet_Path.Text, Destination_Spreadsheet_Path.Text, nameCol, dateCol, descCol);
+                executor.execute(Source_Spreadsheet_Path.Text, Destination_Spreadsheet_Path.Text, nameCol, dateCol, descCol, Scan_Dates_Checkbox.IsChecked ,Scan_Descriptions_Checkbox.IsChecked);
 
                 Alert_Text.Text = "Successfully scanned file for duplicates! Check the new file created for results!";
                 Alert_Text.Foreground = Brushes.LimeGreen;
@@ -115,6 +115,7 @@ namespace DuplicateFinderGUI
 
         private bool ValidateOutputPath()
         {
+            //TODO: don't hardcode in 5 indexes back, should look at wheret the period is instead
             String input = Destination_Spreadsheet_Path.Text;
             String fileExtension = input.Substring(input.Length - 5, 5);
             if(fileExtension != ".xlsx")
@@ -159,5 +160,6 @@ namespace DuplicateFinderGUI
         {
 
         }
+
     }
 }

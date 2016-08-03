@@ -22,7 +22,7 @@ namespace DuplicateFinder
         /// </summary>
         /// <param name="tolerance"></param>
         /// <param name="pqSize"></param>
-        public void prune(double tolerance, int pqSize, List<Record> sortedTree)
+        public void prune(double tolerance, int pqSize, List<Record> sortedTree, bool scanDates, bool scanDescriptions)
         {
             try
             {
@@ -54,7 +54,7 @@ namespace DuplicateFinder
                         foreach (ListPQNode<Cluster> node in listPQ)
                         {
                             Cluster cluster = node.getValue();
-                            if (compareRecordToCluster(current, cluster, tolerance, node))
+                            if (compareRecordToCluster(current, cluster, tolerance, node, scanDates, scanDescriptions))
                             {
                                 inPQ = true;
                                 break;  //if match, stop
@@ -82,27 +82,23 @@ namespace DuplicateFinder
         /// <param name="r"></param>
         /// <param name="c"></param>
         /// <returns></returns>
-        private bool compareRecordToCluster(Record queryRecord, Cluster cluster, double tolerance, ListPQNode<Cluster> node)
+        private bool compareRecordToCluster(Record queryRecord, Cluster cluster, double tolerance, ListPQNode<Cluster> node, bool scanDates, bool scanDescriptions)
         {
             bool result = false;
             foreach(Record r in cluster.getRecords())
             {   //check if record is similar enough to record in cluster to be added
 
-                if (queryRecord.getID() == 120 && r.getID() == 119)
-                {
-                    int x = 0;
-                }
                 double similarity = strComp.jaroWinklerCompare(queryRecord, r);   //get initial similarity measure
 
                 //calculateDeductions(queryRecord, r, similarity);            //apply deductions
 
-                if(similarity < (tolerance+(tolerance*0.07))                //if the similarity is close around the tolerance, check the date
+                if(scanDates && (similarity < (tolerance+(tolerance*0.07)))                //if the similarity is close around the tolerance, check the date
                     && similarity > tolerance - (tolerance * 0.07))
                 {
                     similarity = compareDates(queryRecord, r, similarity);
                 }
 
-                if (similarity < (tolerance + (tolerance * 0.05))            //if the similarity is still indecisive, check the description as a last resort
+                if (scanDescriptions && (similarity < (tolerance + (tolerance * 0.05)))            //if the similarity is still indecisive, check the description as a last resort
                     && similarity > tolerance - (tolerance * 0.05))
                 {
                     double descSimilarity = strComp.nGramCompareDesc(queryRecord, r);

@@ -14,7 +14,7 @@ namespace DuplicateFinder
 
         }
 
-        public void execute(String inputPath, String outputPath, String nameCol, String dateCol, String descCol)
+        public void execute(String inputPath, String outputPath, String nameCol, String dateCol, String descCol, bool? Scan_Dates, bool? Scan_Descriptions)
         {
             try
             {
@@ -22,8 +22,12 @@ namespace DuplicateFinder
                 DataSet data = new DataSet(dataRetriever);
                 DuplicatePruner pruner = new DuplicatePruner(data);
 
-                pruner.prune(0.90, 20, data.getRows());
-                pruner.prune(0.90, 20, data.getReverseRows());
+                //convert the stupid nullables to non-nullables
+                bool scanDates = Scan_Dates ?? default(bool);
+                bool scanDescriptions = Scan_Descriptions ?? default(bool);
+
+                pruner.prune(0.90, 20, data.getRows(), scanDates, scanDescriptions);
+                pruner.prune(0.90, 20, data.getReverseRows(), scanDates, scanDescriptions);
                 List<Cluster> clusters = data.getClusters();
 
                 foreach (Cluster c in data.getClusters())
