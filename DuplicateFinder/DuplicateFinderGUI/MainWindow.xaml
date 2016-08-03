@@ -17,11 +17,13 @@
         <Label x:Name="Name_Column1" Content="Name Column" HorizontalAlignment="Left" Height="22" Margin="57,107,0,0" VerticalAlignment="Top" Width="122" FontFamily="Arial"/>
         <Label x:Name="Date_Column_Label" Content="Date Column" HorizontalAlignment="Left" Height="29" Margin="57,132,0,0" VerticalAlignment="Top" Width="122" FontFamily="Arial"/>
         <Label x:Name="Description_Column_Label" Content="Description Column" HorizontalAlignment="Left" Height="30" Margin="57,155,0,0" VerticalAlignment="Top" Width="122"/>
-        <Label x:Name="Information_Label" Content="Information" HorizontalAlignment="Left" Height="26" Margin="217,208,0,0" VerticalAlignment="Top" Width="79" FontWeight="Bold" FontFamily="Arial"/>
+        <Label x:Name="Information_Label" Content="Information" HorizontalAlignment="Left" Height="26" Margin="219,213,0,0" VerticalAlignment="Top" Width="79" FontWeight="Bold" FontFamily="Arial"/>
         <TextBlock x:Name="Alert_Text" HorizontalAlignment="Left" Height="45" Margin="50,234,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="424" FontFamily="Arial" FontSize="11" FontWeight="Bold" Visibility="Hidden"/>
         <Button x:Name="File_Browser_Button" Content="Browse" HorizontalAlignment="Left" Height="20" Margin="415,10,0,0" VerticalAlignment="Top" Width="69" FontFamily="Arial" Click="File_Browser_Button_Click"/>
         <CheckBox x:Name="Scan_Dates_Checkbox" Content="" HorizontalAlignment="Left" Margin="38,137,0,0" VerticalAlignment="Top" IsChecked="True"/>
         <CheckBox x:Name="Scan_Descriptions_Checkbox" Content="" HorizontalAlignment="Left" Margin="38,161,0,0" VerticalAlignment="Top" IsChecked="True"/>
+        <TextBox x:Name="NumCols" HorizontalAlignment="Left" Height="22" Margin="203,186,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="28" TextChanged="NumCols_TextChanged"/>
+        <Label x:Name="NumCols_Label" Content="Number of Columns" HorizontalAlignment="Left" Margin="57,182,0,0" VerticalAlignment="Top" Width="122"/>
 
     </Grid>
 </Window>

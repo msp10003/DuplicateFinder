@@ -22,7 +22,7 @@ namespace DuplicateFinder
         private const int NUM_ROWS_OFFSET = 2;
         private List<SLCellPointRange> rows;
 
-        public DataRetriever(String pathName, String nameCol, String claimDateCol, String descCol)
+        public DataRetriever(String pathName, String nameCol, String claimDateCol, String descCol, int numberOfColumns)
         {
             try
             {
@@ -38,7 +38,7 @@ namespace DuplicateFinder
                 nameColumn = nameCol;
                 claimDateColumn = claimDateCol;
                 descriptionCol = descCol;
-                numCols = 1;
+                numCols = numberOfColumns;
                 //TODO probably don't want to hardcode this in
                 numRows = NUM_ROWS_OFFSET;
             }
@@ -64,16 +64,6 @@ namespace DuplicateFinder
             }
 
             rows = new List<SLCellPointRange>();
-
-            while (true)
-            {
-                String s = excelFile.GetCellValueAsString(1, numCols);
-                if (String.IsNullOrEmpty(excelFile.GetCellValueAsString(1, numCols)))
-                {
-                    break;
-                }
-                numCols++;
-            }
 
             while (true)
             {
@@ -143,8 +133,8 @@ namespace DuplicateFinder
                     style.Fill.SetPattern(PatternValues.Solid, System.Drawing.Color.Red, System.Drawing.Color.Blue);
 
                     //highlight the possible duplicates in red
-                    targetFile.SetCellStyle(records[i].getID(), 1, records[i].getID(), numCols, style); 
-                    targetFile.SetCellValue(records[i].getID(), numCols, "Possible duplicate of Row #" + records[0].getID() + " , Claimant " + records[0].getFullName());
+                    targetFile.SetCellStyle(records[i].getID(), 1, records[i].getID(), numCols+1, style); 
+                    targetFile.SetCellValue(records[i].getID(), numCols+1, "Possible duplicate of Row #" + records[0].getID() + " , Claimant " + records[0].getFullName());
                     
                 }
             }

@@ -61,9 +61,11 @@ namespace DuplicateFinderGUI
                 String nameCol = Name_Column.Text;
                 String dateCol = Date_Column.Text;
                 String descCol = Description_Column.Text;
-                
+                int numCols = 0;
+                Int32.TryParse(NumCols.Text, out numCols);
+
                 Executor executor = new Executor();
-                executor.execute(Source_Spreadsheet_Path.Text, Destination_Spreadsheet_Path.Text, nameCol, dateCol, descCol, Scan_Dates_Checkbox.IsChecked ,Scan_Descriptions_Checkbox.IsChecked);
+                executor.execute(Source_Spreadsheet_Path.Text, Destination_Spreadsheet_Path.Text, nameCol, dateCol, descCol, numCols, Scan_Dates_Checkbox.IsChecked ,Scan_Descriptions_Checkbox.IsChecked);
 
                 Alert_Text.Text = "Successfully scanned file for duplicates! Check the new file created for results!";
                 Alert_Text.Foreground = Brushes.LimeGreen;
@@ -157,6 +159,11 @@ namespace DuplicateFinderGUI
         }
 
         private void Scan_Progress_Bar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+
+        }
+
+        private void NumCols_TextChanged(object sender, TextChangedEventArgs e)
         {
 
         }

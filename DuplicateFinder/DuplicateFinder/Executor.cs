@@ -14,11 +14,11 @@ namespace DuplicateFinder
 
         }
 
-        public void execute(String inputPath, String outputPath, String nameCol, String dateCol, String descCol, bool? Scan_Dates, bool? Scan_Descriptions)
+        public void execute(String inputPath, String outputPath, String nameCol, String dateCol, String descCol, int numberOfColumns, bool? Scan_Dates, bool? Scan_Descriptions)
         {
             try
             {
-                DataRetriever dataRetriever = new DataRetriever(inputPath, nameCol, dateCol, descCol);
+                DataRetriever dataRetriever = new DataRetriever(inputPath, nameCol, dateCol, descCol, numberOfColumns);
                 DataSet data = new DataSet(dataRetriever);
                 DuplicatePruner pruner = new DuplicatePruner(data);
 
