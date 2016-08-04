@@ -120,6 +120,8 @@ namespace DuplicateFinder
         public void writeDuplicates(List<Cluster> clusters, String pathName)
         {
             SLDocument targetFile = new SLDocument(pathName);
+            SLStyle style = targetFile.CreateStyle();
+
             foreach (Cluster c in clusters)
             {
                 List<Record> records = c.getRecords();
@@ -127,15 +129,20 @@ namespace DuplicateFinder
                 {
                     continue;
                 }
-                for(int i=1; i<records.Count; i++)
-                { 
-                    SLStyle style = targetFile.CreateStyle();
-                    style.Fill.SetPattern(PatternValues.Solid, System.Drawing.Color.Red, System.Drawing.Color.Blue);
+                //mark the first record in orange
+                style.Fill.SetPattern(PatternValues.Solid, System.Drawing.Color.Orange, System.Drawing.Color.Blue);
 
+                targetFile.SetCellStyle(records[0].getID(), 1, records[0].getID(), numCols + 1, style);
+                targetFile.SetCellValue(records[0].getID(), numCols + 1, "This row has potential duplicates");
+                targetFile.SetColumnWidth(numCols + 1, 80);
+
+                style.Fill.SetPattern(PatternValues.Solid, System.Drawing.Color.Red, System.Drawing.Color.Blue);
+
+                for(int i=1; i<records.Count; i++)
+                {                     
                     //highlight the possible duplicates in red
                     targetFile.SetCellStyle(records[i].getID(), 1, records[i].getID(), numCols+1, style); 
                     targetFile.SetCellValue(records[i].getID(), numCols+1, "Possible duplicate of Row #" + records[0].getID() + " , Claimant " + records[0].getFullName());
-                    
                 }
             }
             targetFile.Save();

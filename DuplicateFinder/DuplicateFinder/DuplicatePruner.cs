@@ -90,15 +90,13 @@ namespace DuplicateFinder
 
                 double similarity = strComp.jaroWinklerCompare(queryRecord, r);   //get initial similarity measure
 
-                //calculateDeductions(queryRecord, r, similarity);            //apply deductions
-
                 if(scanDates && (similarity < (tolerance+(tolerance*0.07)))                //if the similarity is close around the tolerance, check the date
                     && similarity > tolerance - (tolerance * 0.07))
                 {
                     similarity = compareDates(queryRecord, r, similarity);
                 }
 
-                if (scanDescriptions && (similarity < (tolerance + (tolerance * 0.05)))            //if the similarity is still indecisive, check the description as a last resort
+                if (scanDescriptions && (similarity < (tolerance + (tolerance * 0.05)))    //if the similarity is still indecisive, check the description as a last resort
                     && similarity > tolerance - (tolerance * 0.05))
                 {
                     double descSimilarity = strComp.nGramCompareDesc(queryRecord, r);
@@ -128,42 +126,6 @@ namespace DuplicateFinder
             //insertPQ(queryRecord.getCluster());
 
             return result;
-        }
-
-        /// <summary>
-        /// Takes into account various similarity deductions based on corner cases
-        /// </summary>
-        /// <param name="queryRecord"></param>
-        /// <param name="r"></param>
-        /// <param name="similarity"></param>
-        private void calculateDeductions(Record queryRecord, Record r, double similarity)
-        {
-            //TODO this section is hideous
-            double firstNameDiff = 0.0;
-            double lastNameDiff = 0.0;
-            //if the names differ in length by 3 or more characters, a deduction is in order
-            if (!String.IsNullOrEmpty(queryRecord.getFirstName()) && !String.IsNullOrEmpty(r.getFirstName()))
-            {
-                firstNameDiff = queryRecord.getFirstName().Length - r.getFirstName().Length;
-            }
-            if (!String.IsNullOrEmpty(queryRecord.getLastName()) && !String.IsNullOrEmpty(r.getLastName()))
-            {
-                lastNameDiff = queryRecord.getLastName().Length - r.getLastName().Length;
-            }
-            if (firstNameDiff > 2)
-            {
-                similarity = similarity - (0.075 * (firstNameDiff - 2) * similarity);
-            }
-            if (lastNameDiff > 2)
-            {
-                similarity = similarity - (0.075 * (lastNameDiff - 2) * similarity);
-            }
-
-            //put emphasis on the first letter of the last names
-            if(queryRecord.getLastName()[0] != r.getLastName()[0])
-            {
-                similarity = similarity - (0.1 * similarity);
-            }
         }
 
         /// <summary>
