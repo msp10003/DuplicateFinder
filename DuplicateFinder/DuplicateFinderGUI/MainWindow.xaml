@@ -13,17 +13,19 @@
         <TextBox x:Name="Name_Column" HorizontalAlignment="Left" Height="20" Margin="203,111,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="28" MaxLength="1"/>
         <TextBox x:Name="Date_Column" HorizontalAlignment="Left" Height="20" Margin="203,136,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="28" MaxLength="1"/>
         <TextBox x:Name="Description_Column" HorizontalAlignment="Left" Height="20" Margin="203,161,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="28" MaxLength="1"/>
-        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Height="70" Margin="269,111,0,0" TextWrapping="Wrap" Text="Enter the file path name of the spreadsheet you would like to scan (i.e. C:\Documents\test.xlsx). Enter the file path of the new file you would like Duplicate Scanner to save. Then enter the column letters for the name, date, and description fields. When ready, click Execute!" VerticalAlignment="Top" Width="215" FontFamily="Arial" FontSize="10"/>
-        <Label x:Name="Name_Column1" Content="Name Column" HorizontalAlignment="Left" Height="22" Margin="57,107,0,0" VerticalAlignment="Top" Width="122" FontFamily="Arial"/>
-        <Label x:Name="Date_Column_Label" Content="Date Column" HorizontalAlignment="Left" Height="29" Margin="57,132,0,0" VerticalAlignment="Top" Width="122" FontFamily="Arial"/>
+        <Label x:Name="Name_Column1" Content="Name Column" HorizontalAlignment="Left" Height="22" Margin="57,110,0,0" VerticalAlignment="Top" Width="122" FontFamily="Arial"/>
+        <Label x:Name="Date_Column_Label" Content="Date Column" HorizontalAlignment="Left" Height="29" Margin="57,134,0,0" VerticalAlignment="Top" Width="122" FontFamily="Arial"/>
         <Label x:Name="Description_Column_Label" Content="Description Column" HorizontalAlignment="Left" Height="30" Margin="57,157,0,0" VerticalAlignment="Top" Width="122"/>
         <Label x:Name="Information_Label" Content="Information" HorizontalAlignment="Left" Height="26" Margin="219,213,0,0" VerticalAlignment="Top" Width="79" FontWeight="Bold" FontFamily="Arial"/>
         <TextBlock x:Name="Alert_Text" HorizontalAlignment="Left" Height="45" Margin="48,239,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="424" FontFamily="Arial" FontSize="11" FontWeight="Bold" Visibility="Hidden"/>
         <Button x:Name="File_Browser_Button" Content="Browse" HorizontalAlignment="Left" Height="20" Margin="415,10,0,0" VerticalAlignment="Top" Width="69" FontFamily="Arial" Click="File_Browser_Button_Click"/>
-        <CheckBox x:Name="Scan_Dates_Checkbox" Content="" HorizontalAlignment="Left" Margin="38,137,0,0" VerticalAlignment="Top" IsChecked="True"/>
-        <CheckBox x:Name="Scan_Descriptions_Checkbox" Content="" HorizontalAlignment="Left" Margin="38,161,0,0" VerticalAlignment="Top" IsChecked="True"/>
+        <CheckBox x:Name="Scan_Dates_Checkbox" Content="" HorizontalAlignment="Left" Margin="38,137,0,0" VerticalAlignment="Top" IsChecked="True" RenderTransformOrigin="0.406,1.763" Checked="Scan_Dates_Checkbox_Checked"/>
+        <CheckBox x:Name="Scan_Descriptions_Checkbox" Content="" HorizontalAlignment="Left" Margin="38,161,0,0" VerticalAlignment="Top" IsChecked="True" Checked="Scan_Descriptions_Checkbox_Checked"/>
         <TextBox x:Name="NumCols" HorizontalAlignment="Left" Height="22" Margin="203,186,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="28" TextChanged="NumCols_TextChanged"/>
         <Label x:Name="NumCols_Label" Content="Number of Columns" HorizontalAlignment="Left" Margin="57,184,0,0" VerticalAlignment="Top" Width="122"/>
+        <Slider x:Name="NamePrecisionSlider" HorizontalAlignment="Left" Height="22" Margin="261,111,0,0" VerticalAlignment="Top" Width="211" Value="9" SelectionEnd="-1" IsSnapToTickEnabled="True" MinWidth="5" Minimum="8" TickFrequency="0.05"/>
+        <Slider x:Name="DatePrecisionSlider" HorizontalAlignment="Left" Height="18" Margin="261,138,0,0" VerticalAlignment="Top" Width="211" Value="5" ValueChanged="DatePrecisionSlider_ValueChanged" IsSnapToTickEnabled="True"/>
+        <Slider x:Name="DescriptionPrecisionSlider" HorizontalAlignment="Left" Margin="261,163,0,0" VerticalAlignment="Top" Width="211" Value="8" ValueChanged="DescriptionPrecisionSlider_ValueChanged" IsSnapToTickEnabled="True" Minimum="6" TickFrequency="0.1"/>
 
     </Grid>
 </Window>

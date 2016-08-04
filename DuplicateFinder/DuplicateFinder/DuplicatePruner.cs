@@ -22,7 +22,7 @@ namespace DuplicateFinder
         /// </summary>
         /// <param name="tolerance"></param>
         /// <param name="pqSize"></param>
-        public void prune(double tolerance, int pqSize, List<Record> sortedTree, bool scanDates, bool scanDescriptions)
+        public void prune(double tolerance, int pqSize, List<Record> sortedTree, bool scanDates, bool scanDescriptions, double datePrecision, double descriptionPrecision)
         {
             try
             {
@@ -54,7 +54,7 @@ namespace DuplicateFinder
                         foreach (ListPQNode<Cluster> node in listPQ)
                         {
                             Cluster cluster = node.getValue();
-                            if (compareRecordToCluster(current, cluster, tolerance, node, scanDates, scanDescriptions))
+                            if (compareRecordToCluster(current, cluster, tolerance, node, scanDates, scanDescriptions, datePrecision, descriptionPrecision))
                             {
                                 inPQ = true;
                                 break;  //if match, stop
@@ -82,7 +82,7 @@ namespace DuplicateFinder
         /// <param name="r"></param>
         /// <param name="c"></param>
         /// <returns></returns>
-        private bool compareRecordToCluster(Record queryRecord, Cluster cluster, double tolerance, ListPQNode<Cluster> node, bool scanDates, bool scanDescriptions)
+        private bool compareRecordToCluster(Record queryRecord, Cluster cluster, double tolerance, ListPQNode<Cluster> node, bool scanDates, bool scanDescriptions, double datePrecision, double descriptionPrecision)
         {
             bool result = false;
             foreach(Record r in cluster.getRecords())
@@ -90,25 +90,28 @@ namespace DuplicateFinder
 
                 double similarity = strComp.jaroWinklerCompare(queryRecord, r);   //get initial similarity measure
 
-                if(scanDates && (similarity < (tolerance+(tolerance*0.07)))                //if the similarity is close around the tolerance, check the date
-                    && similarity > tolerance - (tolerance * 0.07))
-                {
-                    similarity = compareDates(queryRecord, r, similarity);
-                }
+                //if(scanDates && (similarity < (tolerance+(tolerance*0.07)))                //if the similarity is close around the tolerance, check the date
+                //    && similarity > tolerance - (tolerance * 0.07))
+                //{
+                //    similarity = compareDates(queryRecord, r, similarity);
+                //}
 
-                if (scanDescriptions && (similarity < (tolerance + (tolerance * 0.05)))    //if the similarity is still indecisive, check the description as a last resort
-                    && similarity > tolerance - (tolerance * 0.05))
-                {
-                    double descSimilarity = strComp.nGramCompareDesc(queryRecord, r);
-                    if(descSimilarity > tolerance)
-                    {
-                        similarity = similarity + (similarity * 0.08);
-                    }
-                    else if(descSimilarity < (0.5) * tolerance)
-                    {
-                        similarity = similarity - (similarity * 0.15);
-                    }
-                }
+                //if (scanDescriptions && (similarity < (tolerance + (tolerance * 0.05)))    //if the similarity is still indecisive, check the description as a last resort
+                //    && similarity > tolerance - (tolerance * 0.05))
+                //{
+                //    double descSimilarity = strComp.nGramCompareDesc(queryRecord, r);
+                //    if(descSimilarity > tolerance)
+                //    {
+                //        similarity = similarity + (similarity * 0.08);
+                //    }
+                //    else if(descSimilarity < (0.5) * tolerance)
+                //    {
+                //        similarity = similarity - (similarity * 0.15);
+                //    }
+                //}
+
+                if(scanDates) similarity = compareDates(queryRecord, r, similarity, datePrecision);
+                if(scanDescriptions) similarity = compareDescriptions(queryRecord, r, similarity, descriptionPrecision);
 
                 if (similarity >= tolerance)
                 {   //if yes, update the cluster
@@ -134,39 +137,60 @@ namespace DuplicateFinder
         /// <param name="queryRecord"></param>
         /// <param name="r1"></param>
         /// <param name="similarity"></param>
-        private double compareDates(Record queryRecord, Record r1, double similarity)
+        private double compareDates(Record queryRecord, Record r1, double similarity, double precision)
         {
+            //TODO if precision is max, we want to disqualify anything that's not an exact match, rather than simply docking points for it
             DateTime d1 = queryRecord.getDate();
             DateTime d2 = r1.getDate();
             if(d1.Equals(new DateTime(1900,1,1)) || d2.Equals(new DateTime(1900, 1, 1))){
                 //one of the records didn't have a date, disregard this comparison
                 return similarity;
             }
+            //ensure that Excel didn't do a dumb thing where the date was off by 2000 years
             if(d1.Year < 10)
             {
                 d1.AddYears(2000);
             }
-
             if (d2.Year < 10)
             {
                 d2.AddYears(2000);
             }
+
             double dateDiff = Math.Abs((d1 - d2).TotalDays);
             if(dateDiff == 0)
             {
                 similarity = similarity + (similarity * 0.2);
             }
-            else if(dateDiff <= 2)
+            else if(dateDiff <= Math.Pow(precision-10, 2.5))
             {
                 similarity = similarity + (similarity * 0.1);
             }
-            else if(dateDiff >= 14)
+            else if(dateDiff >= Math.Pow(precision-10, 2.5))
             {
                 similarity = similarity - (similarity * 0.1);
             }
             return similarity;
         }
 
+        /// <summary>
+        /// Returns an updated similarity score based on the descriptions
+        /// </summary>
+        /// <returns></returns>
+        private double compareDescriptions(Record queryRecord, Record r, double similarity, double precision)
+        {
+            //TODO If precision comes in at the max of 10 from the slider, we want to ensure that only exact matches are sufficient
+
+            double descSimilarity = strComp.nGramCompareDesc(queryRecord, r);
+            if(descSimilarity > (precision/10))
+            {
+                similarity = similarity + (similarity * 0.08);
+            }
+            else if(descSimilarity < (0.5) * (precision/10))
+            {
+                similarity = similarity - (similarity * 0.15);
+            }
+            return similarity;
+        }
         /// <summary>
         /// Adds the record to the given cluster and updates the underlying clusters collection
         /// </summary>
