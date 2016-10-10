@@ -65,7 +65,8 @@ namespace DuplicateFinderGUI
                 Int32.TryParse(NumCols.Text, out numCols);
 
                 Executor executor = new Executor();
-                executor.execute(Source_Spreadsheet_Path.Text, Destination_Spreadsheet_Path.Text, nameCol, dateCol, descCol, numCols, Scan_Dates_Checkbox.IsChecked ,Scan_Descriptions_Checkbox.IsChecked, DatePrecisionSlider.Value, DescriptionPrecisionSlider.Value);
+                executor.execute(Source_Spreadsheet_Path.Text, Destination_Spreadsheet_Path.Text, nameCol, dateCol, descCol, 
+                    numCols, Scan_Dates_Checkbox.IsChecked ,Scan_Descriptions_Checkbox.IsChecked, DatePrecisionSlider.Value, DescriptionPrecisionSlider.Value, SearchEnhanceCheckbox.IsChecked);
 
                 Alert_Text.Text = "Successfully scanned file for duplicates! Check the new file created for results!";
                 Alert_Text.Foreground = Brushes.LimeGreen;
@@ -184,6 +185,11 @@ namespace DuplicateFinderGUI
         }
 
         private void Scan_Descriptions_Checkbox_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
 
         }
