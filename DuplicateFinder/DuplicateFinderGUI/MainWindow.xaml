@@ -10,23 +10,23 @@
         <Label Content="Source Spreadsheet Path" HorizontalAlignment="Left" Margin="38,30,0,0" VerticalAlignment="Top" FontFamily="Arial" FontWeight="Bold"/>
         <Label Content="Output Spreadsheet Path" HorizontalAlignment="Left" Margin="40,74,0,0" VerticalAlignment="Top" FontFamily="Arial" FontWeight="Bold"/>
         <Rectangle Fill="#FF404040" HorizontalAlignment="Left" Height="53" Margin="33,260,0,0" Stroke="Black" VerticalAlignment="Top" Width="446"/>
-        <TextBox x:Name="Name_Column" HorizontalAlignment="Left" Height="20" Margin="203,111,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="28" MaxLength="1"/>
-        <TextBox x:Name="Date_Column" HorizontalAlignment="Left" Height="20" Margin="203,136,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="28" MaxLength="1"/>
-        <TextBox x:Name="Description_Column" HorizontalAlignment="Left" Height="20" Margin="203,161,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="28" MaxLength="1"/>
-        <Label x:Name="Name_Column1" Content="Name Column" HorizontalAlignment="Left" Height="22" Margin="57,110,0,0" VerticalAlignment="Top" Width="122" FontFamily="Arial"/>
-        <Label x:Name="Date_Column_Label" Content="Date Column" HorizontalAlignment="Left" Height="29" Margin="57,134,0,0" VerticalAlignment="Top" Width="122" FontFamily="Arial"/>
-        <Label x:Name="Description_Column_Label" Content="Description Column" HorizontalAlignment="Left" Height="30" Margin="57,157,0,0" VerticalAlignment="Top" Width="122"/>
+        <TextBox x:Name="Name_Column" HorizontalAlignment="Left" Height="20" Margin="203,132,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="28" MaxLength="1"/>
+        <TextBox x:Name="Date_Column" HorizontalAlignment="Left" Height="20" Margin="203,157,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="28" MaxLength="1"/>
+        <TextBox x:Name="Description_Column" HorizontalAlignment="Left" Height="20" Margin="203,182,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="28" MaxLength="1"/>
+        <Label x:Name="Name_Column1" Content="Name Column" HorizontalAlignment="Left" Height="22" Margin="57,131,0,0" VerticalAlignment="Top" Width="122" FontFamily="Arial"/>
+        <Label x:Name="Date_Column_Label" Content="Date Column" HorizontalAlignment="Left" Height="29" Margin="57,155,0,0" VerticalAlignment="Top" Width="122" FontFamily="Arial"/>
+        <Label x:Name="Description_Column_Label" Content="Description Column" HorizontalAlignment="Left" Height="30" Margin="57,178,0,0" VerticalAlignment="Top" Width="122"/>
         <Label x:Name="Information_Label" Content="Information" HorizontalAlignment="Left" Height="26" Margin="214,239,0,0" VerticalAlignment="Top" Width="79" FontWeight="Bold" FontFamily="Arial"/>
         <TextBlock x:Name="Alert_Text" HorizontalAlignment="Left" Height="45" Margin="48,239,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="424" FontFamily="Arial" FontSize="11" FontWeight="Bold" Visibility="Hidden"/>
         <Button x:Name="File_Browser_Button" Content="Browse" HorizontalAlignment="Left" Height="20" Margin="415,10,0,0" VerticalAlignment="Top" Width="69" FontFamily="Arial" Click="File_Browser_Button_Click"/>
-        <CheckBox x:Name="Scan_Dates_Checkbox" Content="" HorizontalAlignment="Left" Margin="38,137,0,0" VerticalAlignment="Top" IsChecked="True" RenderTransformOrigin="0.406,1.763" Checked="Scan_Dates_Checkbox_Checked"/>
-        <CheckBox x:Name="Scan_Descriptions_Checkbox" Content="" HorizontalAlignment="Left" Margin="38,161,0,0" VerticalAlignment="Top" IsChecked="True" Checked="Scan_Descriptions_Checkbox_Checked"/>
-        <TextBox x:Name="NumCols" HorizontalAlignment="Left" Height="22" Margin="203,186,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="28" TextChanged="NumCols_TextChanged"/>
-        <Label x:Name="NumCols_Label" Content="Number of Columns" HorizontalAlignment="Left" Margin="57,184,0,0" VerticalAlignment="Top" Width="122"/>
-        <Slider x:Name="NamePrecisionSlider" HorizontalAlignment="Left" Height="22" Margin="261,111,0,0" VerticalAlignment="Top" Width="211" Value="9" SelectionEnd="-1" IsSnapToTickEnabled="True" MinWidth="5" Minimum="8" TickFrequency="0.05"/>
-        <Slider x:Name="DatePrecisionSlider" HorizontalAlignment="Left" Height="18" Margin="261,138,0,0" VerticalAlignment="Top" Width="211" Value="5" ValueChanged="DatePrecisionSlider_ValueChanged" IsSnapToTickEnabled="True"/>
-        <Slider x:Name="DescriptionPrecisionSlider" HorizontalAlignment="Left" Margin="261,163,0,0" VerticalAlignment="Top" Width="211" Value="8" ValueChanged="DescriptionPrecisionSlider_ValueChanged" IsSnapToTickEnabled="True" Minimum="6" TickFrequency="0.1"/>
-        <CheckBox x:Name="SearchEnhanceCheckbox" Content="Turn Search Enhance On" HorizontalAlignment="Left" Margin="40,224,0,0" VerticalAlignment="Top" Checked="CheckBox_Checked"/>
+        <CheckBox x:Name="Scan_Dates_Checkbox" Content="" HorizontalAlignment="Left" Margin="38,158,0,0" VerticalAlignment="Top" IsChecked="True" RenderTransformOrigin="0.406,1.763" Checked="Scan_Dates_Checkbox_Checked" Unchecked="Scan_Dates_Checkbox_Unchecked"/>
+        <CheckBox x:Name="Scan_Descriptions_Checkbox" Content="" HorizontalAlignment="Left" Margin="38,182,0,0" VerticalAlignment="Top" IsChecked="True" Checked="Scan_Descriptions_Checkbox_Checked" Unchecked="Scan_Descriptions_Checkbox_Unchecked"/>
+        <TextBox x:Name="NumCols" HorizontalAlignment="Left" Height="22" Margin="203,206,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="28" TextChanged="NumCols_TextChanged"/>
+        <Label x:Name="NumCols_Label" Content="Number of Columns" HorizontalAlignment="Left" Margin="57,205,0,0" VerticalAlignment="Top" Width="122"/>
+        <Slider x:Name="NamePrecisionSlider" HorizontalAlignment="Left" Height="22" Margin="261,132,0,0" VerticalAlignment="Top" Width="211" Value="0.9" SelectionEnd="-1" IsSnapToTickEnabled="True" MinWidth="5" Minimum="0.8" TickFrequency="0.05" ValueChanged="NamePrecisionSlider_ValueChanged" Maximum="1" SmallChange="0.01" IsEnabled="{Binding ElementName=AutoSearchCheckbox, Path=IsChecked}" Background="#00000000" Foreground="White"/>
+        <Slider x:Name="DatePrecisionSlider" HorizontalAlignment="Left" Height="18" Margin="261,159,0,0" VerticalAlignment="Top" Width="211" Value="5" ValueChanged="DatePrecisionSlider_ValueChanged" IsSnapToTickEnabled="True" IsEnabled="{Binding ElementName=Scan_Dates_Checkbox, Path=IsChecked}"/>
+        <Slider x:Name="DescriptionPrecisionSlider" HorizontalAlignment="Left" Margin="261,184,0,0" VerticalAlignment="Top" Width="211" Value="8" ValueChanged="DescriptionPrecisionSlider_ValueChanged" IsSnapToTickEnabled="True" Minimum="6" TickFrequency="0.1" IsEnabled="{Binding ElementName=Scan_Descriptions_Checkbox, Path=IsChecked}"/>
+        <CheckBox x:Name="AutoSearchCheckbox" Content=" Auto-Search" HorizontalAlignment="Left" Margin="40,102,0,0" VerticalAlignment="Top" Checked="AutoSearch_CheckBox_Checked" Unchecked ="AutoSearch_CheckBox_Unchecked" FontSize="13" IsChecked="True"/>
 
     </Grid>
 </Window>

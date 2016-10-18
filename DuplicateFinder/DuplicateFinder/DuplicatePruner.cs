@@ -20,9 +20,9 @@ namespace DuplicateFinder
         /// <summary>
         /// Main kickoff method for the duplicate matching algorithm
         /// </summary>
-        /// <param name="tolerance"></param>
-        /// <param name="pqSize"></param>
-        public void prune(double tolerance, int pqSize, List<Record> sortedTree, bool scanDates, bool scanDescriptions, double datePrecision, double descriptionPrecision, bool searchEnhance)
+        /// <param name="tolerance">pre-determined level of acceptance, for use with auto search</param>
+        /// <param name="pqSize">size of the priority queue to be used for storing clusters</param>
+        public void prune(double tolerance, int pqSize, List<Record> sortedTree, bool scanDates, bool scanDescriptions, double namePrecision, double datePrecision, double descriptionPrecision, bool autoSearch)
         {
             try
             {
@@ -54,7 +54,17 @@ namespace DuplicateFinder
                         foreach (ListPQNode<Cluster> node in listPQ)
                         {
                             Cluster cluster = node.getValue();
-                            if (compareRecordToCluster(current, cluster, tolerance, node, scanDates, scanDescriptions, datePrecision, descriptionPrecision, searchEnhance))
+                            bool inCluster;
+
+                            //if Auto Search is on, do one Compare method, if it's not, do the other one
+                            if (autoSearch)
+                            {
+                                inCluster = compareRecordToCluster(current, cluster, tolerance, node, scanDates, scanDescriptions);
+                            }else{
+                                inCluster = compareRecordToCluster(current, cluster, tolerance, node, scanDates, scanDescriptions, namePrecision, datePrecision, descriptionPrecision);
+                            }
+
+                            if (inCluster)
                             {
                                 inPQ = true;
                                 break;  //if match, stop
@@ -79,31 +89,96 @@ namespace DuplicateFinder
         /// <summary>
         /// Checks whether a record belongs in a cluster using string comparison
         /// </summary>
-        private bool compareRecordToCluster(Record queryRecord, Cluster cluster, double tolerance, ListPQNode<Cluster> node, bool scanDates, bool scanDescriptions, double datePrecision, double descriptionPrecision, double searchEnhance)
+        private bool compareRecordToCluster(Record queryRecord, Cluster cluster, double tolerance, ListPQNode<Cluster> node, bool scanDates, bool scanDescriptions, double namePrecision, double datePrecision, double descriptionPrecision)
         {
             bool result = false;
-            foreach(Record r in cluster.getRecords())
+            foreach(Record clusterRecord in cluster.getRecords())
             {   //check if record is similar enough to record in cluster to be added
 
-                double similarity = strComp.jaroWinklerCompare(queryRecord, r);   //get initial similarity measure
+                //TODO change logic so that it only calculates all three measures if search enhance is on
+                bool similarityFail = false;
+                double totalSimilarity = 0;
+                int divisor = 1;
 
-                //we check if the similarity is allowed per the name precision
-                if (similarity < namePrecision/10)
-                {
-                    break;
+                //first perform mandatory name check
+                double nameSimilarity = strComp.jaroWinklerCompare(queryRecord, clusterRecord);
+                if (nameSimilarity < namePrecision) similarityFail = true;
+
+                double dateSimilarity = compareDates(queryRecord, clusterRecord);
+                if (scanDates && (dateSimilarity < datePrecision)){
+                    similarityFail = true;
+                    divisor++;
                 }
 
-                if(scanDates) similarity = compareDates(queryRecord, r, similarity, datePrecision);
-                if(scanDescriptions) similarity = compareDescriptions(queryRecord, r, similarity, descriptionPrecision);
+                double descriptionSimilarity = compareDescriptions(queryRecord, clusterRecord);
+                if (scanDescriptions && (descriptionSimilarity < descriptionPrecision)){
+                    similarityFail = true;
+                    divisor++;
+                }
 
-                if (similarity >= tolerance)
+                //calculate total similairty
+                //TODO smarter weighting
+                totalSimilarity = (nameSimilarity + dateSimilarity + descriptionPrecision)/divisor;
+
+
+                //if all three similarity checks succeeded, it's a match
+                if (!similarityFail)
                 {   //if yes, update the cluster
                     addRecordToCluster(queryRecord, cluster);
                     updatePQ(node);         //and update the priority queue
                     result = true;
                     break; 
                 }
-                else if(similarity < 0.5)    //if the similarity is way off, don't bother checking the rest of the cluster
+                else if(totalSimilarity < 0.4)    //if the similarity is way off, don't bother checking the rest of the cluster
+                {
+                    break;
+                }
+            }
+            //if we've looked through all the cluster records with no luck, this must belong to its own cluster, so add it to PQ
+            insertPQ(queryRecord.getCluster());
+
+            return result;
+        }
+
+        /// <summary>
+        /// Checks whether record is in cluster, using pre-defined tolerance
+        /// </summary>
+        private bool compareRecordToCluster(Record queryRecord, Cluster cluster, double tolerance, ListPQNode<Cluster> node, bool scanDates, bool scanDescriptions)
+        {
+            bool result = false;
+            foreach (Record r in cluster.getRecords())
+            {   //check if record is similar enough to record in cluster to be added
+
+                double similarity = strComp.jaroWinklerCompare(queryRecord, r);   //get initial similarity measure
+
+                if (scanDates && (similarity < (tolerance + (tolerance * 0.07)))                //if the similarity is close around the tolerance, check the date
+                    && similarity > tolerance - (tolerance * 0.07))
+                {
+                    similarity = compareDates(queryRecord, r, similarity);
+                }
+
+                if (scanDescriptions && (similarity < (tolerance + (tolerance * 0.05)))    //if the similarity is still indecisive, check the description as a last resort
+                    && similarity > tolerance - (tolerance * 0.05))
+                {
+                    double descSimilarity = strComp.nGramCompareDesc(queryRecord, r);
+                    if (descSimilarity > tolerance)
+                    {
+                        similarity = similarity + (similarity * 0.08);
+                    }
+                    else if (descSimilarity < (0.5) * tolerance)
+                    {
+                        similarity = similarity - (similarity * 0.15);
+                    }
+                }
+
+                if (similarity >= tolerance)
+                {   //if yes, update the cluster
+                    addRecordToCluster(queryRecord, cluster);
+                    updatePQ(node);         //and update the priority queue
+                    result = true;
+                    break;
+                }
+                else if (similarity < 0.5)    //if the similarity is way off, don't bother checking the rest of the cluster
                 {
                     break;
                 }
@@ -117,17 +192,14 @@ namespace DuplicateFinder
         /// <summary>
         /// Compares similarity between the dates of the records in question
         /// </summary>
-        /// <param name="queryRecord"></param>
-        /// <param name="r1"></param>
-        /// <param name="similarity"></param>
-        private double compareDates(Record queryRecord, Record r1, double similarity, double precision)
+        private double compareDates(Record queryRecord, Record clusterRecord)
         {
             //TODO if precision is max, we want to disqualify anything that's not an exact match, rather than simply docking points for it
             DateTime d1 = queryRecord.getDate();
-            DateTime d2 = r1.getDate();
+            DateTime d2 = clusterRecord.getDate();
             if(d1.Equals(new DateTime(1900,1,1)) || d2.Equals(new DateTime(1900, 1, 1))){
                 //one of the records didn't have a date, disregard this comparison
-                return similarity;
+                return 0;
             }
             //ensure that Excel didn't do a dumb thing where the date was off by 2000 years
             if(d1.Year < 10)
@@ -140,15 +212,42 @@ namespace DuplicateFinder
             }
 
             double dateDiff = Math.Abs((d1 - d2).TotalDays);
-            if(dateDiff == 0)
+
+            //TODO: scale the similarity based on a bell curve, with close dates yielding high and futher dates disproportionately less
+            return (dateDiff / (-120) + 1);
+        }
+
+        /// <summary>
+        /// Compares similarity alteration based on date. To be used with auto-search
+        /// </summary>
+        private double compareDates(Record queryRecord, Record r1, double similarity)
+        {
+            DateTime d1 = queryRecord.getDate();
+            DateTime d2 = r1.getDate();
+            if (d1.Equals(new DateTime(1900, 1, 1)) || d2.Equals(new DateTime(1900, 1, 1)))
+            {
+                //one of the records didn't have a date, disregard this comparison
+                return similarity;
+            }
+            if (d1.Year < 10)
+            {
+                d1.AddYears(2000);
+            }
+
+            if (d2.Year < 10)
+            {
+                d2.AddYears(2000);
+            }
+            double dateDiff = Math.Abs((d1 - d2).TotalDays);
+            if (dateDiff == 0)
             {
                 similarity = similarity + (similarity * 0.2);
             }
-            else if(dateDiff <= Math.Pow(precision-10, 2.5))
+            else if (dateDiff <= 2)
             {
                 similarity = similarity + (similarity * 0.1);
             }
-            else if(dateDiff >= Math.Pow(precision-10, 2.5))
+            else if (dateDiff >= 14)
             {
                 similarity = similarity - (similarity * 0.1);
             }
@@ -156,29 +255,17 @@ namespace DuplicateFinder
         }
 
         /// <summary>
-        /// Returns an updated similarity score based on the descriptions
+        /// Calculates similarity between descriptions
         /// </summary>
-        /// <returns></returns>
-        private double compareDescriptions(Record queryRecord, Record r, double similarity, double precision)
+        private double compareDescriptions(Record queryRecord, Record r)
         {
-            //TODO If precision comes in at the max of 10 from the slider, we want to ensure that only exact matches are sufficient
-
             double descSimilarity = strComp.nGramCompareDesc(queryRecord, r);
-            if(descSimilarity > (precision/10))
-            {
-                similarity = similarity + (similarity * 0.08);
-            }
-            else if(descSimilarity < (0.5) * (precision/10))
-            {
-                similarity = similarity - (similarity * 0.15);
-            }
-            return similarity;
+            return descSimilarity;
         }
+        
         /// <summary>
         /// Adds the record to the given cluster and updates the underlying clusters collection
         /// </summary>
-        /// <param name="record"></param>
-        /// <param name="cluster"></param>
         private void addRecordToCluster(Record record, Cluster cluster)
         {
             //first update the union-find structure
@@ -190,7 +277,6 @@ namespace DuplicateFinder
         /// <summary>
         /// Updates the PQ with the given cluster
         /// </summary>
-        /// <param name="node"></param>
         private void updatePQ(ListPQNode<Cluster> node)
         {
             listPQ.setMax(node);
@@ -204,8 +290,6 @@ namespace DuplicateFinder
         /// <summary>
         /// Searches through the PQ for a matching cluster, if found updates the PQ
         /// </summary>
-        /// <param name="r"></param>
-        /// <returns></returns>
         private bool searchPQ(Record r)
         {
             foreach (ListPQNode<Cluster> n in listPQ) {

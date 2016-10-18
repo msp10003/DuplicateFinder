@@ -66,7 +66,7 @@ namespace DuplicateFinderGUI
 
                 Executor executor = new Executor();
                 executor.execute(Source_Spreadsheet_Path.Text, Destination_Spreadsheet_Path.Text, nameCol, dateCol, descCol, 
-                    numCols, Scan_Dates_Checkbox.IsChecked ,Scan_Descriptions_Checkbox.IsChecked, DatePrecisionSlider.Value, DescriptionPrecisionSlider.Value, SearchEnhanceCheckbox.IsChecked);
+                    numCols, NamePrecisionSlider.Value, Scan_Dates_Checkbox.IsChecked, Scan_Descriptions_Checkbox.IsChecked, DatePrecisionSlider.Value, DescriptionPrecisionSlider.Value, AutoSearchCheckbox.IsChecked);
 
                 Alert_Text.Text = "Successfully scanned file for duplicates! Check the new file created for results!";
                 Alert_Text.Foreground = Brushes.LimeGreen;
@@ -176,7 +176,26 @@ namespace DuplicateFinderGUI
 
         private void Scan_Dates_Checkbox_Checked(object sender, RoutedEventArgs e)
         {
+            if (AutoSearchCheckbox == null)
+            {
+                return;
+            }
+            else if (AutoSearchCheckbox.IsChecked == false)
+            {
+                DatePrecisionSlider.IsEnabled = true;
+            }
+        }
 
+        private void Scan_Dates_Checkbox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (AutoSearchCheckbox == null)
+            {
+                return;
+            }
+            else if (AutoSearchCheckbox.IsChecked == false)
+            {
+                DatePrecisionSlider.IsEnabled = false;
+            }
         }
 
         private void DescriptionPrecisionSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -186,12 +205,52 @@ namespace DuplicateFinderGUI
 
         private void Scan_Descriptions_Checkbox_Checked(object sender, RoutedEventArgs e)
         {
+            if (AutoSearchCheckbox == null)
+            {
+                return;
+            }
+            else if (AutoSearchCheckbox.IsChecked == false)
+            {
+                DescriptionPrecisionSlider.IsEnabled = true;
+            }
+        }
+
+        private void Scan_Descriptions_Checkbox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (AutoSearchCheckbox == null)
+            {
+                return;
+            }
+            else if (AutoSearchCheckbox.IsChecked == false)
+            {
+                DescriptionPrecisionSlider.IsEnabled = false;
+            }
+        }
+
+        private void NamePrecisionSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
 
         }
 
-        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        private void AutoSearch_CheckBox_Checked(object sender, RoutedEventArgs e)
         {
+            NamePrecisionSlider.IsEnabled = false;
+            DatePrecisionSlider.IsEnabled = false;
+            DescriptionPrecisionSlider.IsEnabled = false;
+        }
 
+        private void AutoSearch_CheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            NamePrecisionSlider.IsEnabled = true;
+            
+            if (Scan_Dates_Checkbox.IsChecked == true)
+            {
+                DatePrecisionSlider.IsEnabled = true;
+            }
+            if(Scan_Descriptions_Checkbox.IsChecked == true)
+            {
+                DescriptionPrecisionSlider.IsEnabled = true;
+            }
         }
 
     }

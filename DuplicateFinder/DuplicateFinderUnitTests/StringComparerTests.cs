@@ -14,5 +14,15 @@ namespace DuplicateFinderUnitTests
             double sim = DuplicateFinder.StringComparer.proximity("CAARTER AMY", "CARTER AMY J");
         }
 
+        [TestMethod]
+        public void CompareDescriptionTest()
+        {
+            DuplicateFinder.StringComparer strComp = new DuplicateFinder.StringComparer();
+            string desc1 = "string azfg cvs zxae utr 43 and some random text";
+            string desc2 = "sttah cvs zxae ufgjeitr ertpo random bext";
+            double sim = strComp.nGramCompareDesc(desc1, desc2);
+            double x = sim;
+        }
+
     }
 }

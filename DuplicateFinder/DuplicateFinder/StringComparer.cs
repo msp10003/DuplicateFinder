@@ -245,18 +245,46 @@ namespace DuplicateFinder
             return similarity;
         }
 
+        /// <summary>
+        /// Calculates the N-Gram similarity between two descriptions (which are just strings). Returns a similarity
+        /// in range 0 - 1 with 1 being a perfect match
+        /// </summary>
         public double nGramCompareDesc(Record r1, Record r2)
         {
+            return nGramCompareDesc(r1.getDescription(), r2.getDescription());
+        }
+
+        /// <summary>
+        /// The underlying method, which uses two strings to compare as opposed to records.
+        /// would make it private but i need it for unit testing
+        /// </summary>
+        public double nGramCompareDesc(string s1, string s2)
+        {
             NameParser parser = new NameParser();
-            List<String> r1NGrams = parser.parseNGrams(r1.getDescription(), 3);
-            List<String> r2NGrams = parser.parseNGrams(r2.getDescription(), 3);
+            List<String> r1NGrams = parser.parseNGrams(s1, 3);
+            List<String> r2NGrams = parser.parseNGrams(s2, 3);
             //TODO code reuse here
-            var result = r1NGrams.Intersect(r2NGrams);
-            double rc = result.Count();
+            double rc = IntersectNonDistinct(r1NGrams, r2NGrams);
             double r1c = r1NGrams.Count;
             double r2c = r2NGrams.Count;
-            double similarity = (rc * 2) / (r1c + r2c);
-            return similarity;
+            return (2* rc / (r1c + r2c));
+        }
+
+        private double IntersectNonDistinct(List<String> l1, List<String> l2)
+        {
+            //TODO do this for real, not just copied from stack overflow
+            ILookup<String, String> lookup1 = l1.ToLookup(i => i);
+            ILookup<String, String> lookup2 = l2.ToLookup(i => i);
+
+            var result =
+            (
+                from group1 in l1.GroupBy(i => i)
+                let group2 = lookup2[group1.Key]
+                from i in (group1.Count() < group2.Count() ? group1 : group2)
+                select i
+            ).ToList();
+
+            return result.Count();
         }
     }
 }

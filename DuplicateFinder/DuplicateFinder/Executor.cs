@@ -14,7 +14,7 @@ namespace DuplicateFinder
 
         }
 
-        public void execute(String inputPath, String outputPath, String nameCol, String dateCol, String descCol, int numberOfColumns, bool? Scan_Dates, bool? Scan_Descriptions, double datePrecision, double descriptionPrecision, bool? Search_Enhance)
+        public void execute(String inputPath, String outputPath, String nameCol, String dateCol, String descCol, int numberOfColumns, double namePrecision, bool? Scan_Dates, bool? Scan_Descriptions, double datePrecision, double descriptionPrecision, bool? Search_Enhance)
         {
             try
             {
@@ -27,8 +27,8 @@ namespace DuplicateFinder
                 bool scanDescriptions = Scan_Descriptions ?? default(bool);
                 bool searchEnhance = Search_Enhance ?? default(bool);
 
-                pruner.prune(0.90, 20, data.getRows(), scanDates, scanDescriptions, datePrecision, descriptionPrecision, searchEnhance);
-                pruner.prune(0.90, 20, data.getReverseRows(), scanDates, scanDescriptions, datePrecision, descriptionPrecision, searchEnhance);
+                pruner.prune(0.90, 20, data.getRows(), scanDates, scanDescriptions, namePrecision, datePrecision, convertToQuadScale(descriptionPrecision), searchEnhance);
+                pruner.prune(0.90, 20, data.getReverseRows(), scanDates, scanDescriptions, namePrecision, datePrecision, convertToQuadScale(descriptionPrecision), searchEnhance);
                 List<Cluster> clusters = data.getClusters();
 
                 foreach (Cluster c in data.getClusters())
@@ -59,6 +59,14 @@ namespace DuplicateFinder
         public int getTotalRows()
         {
             return rowCount;
+        }
+
+        private double convertToQuadScale(double value)
+        {
+            //some math went into determining this
+            double quadValue = (-0.5*(Math.Pow(value,2))) + (1.05 * value) + (0.45);
+
+            return quadValue;
         }
     }
 }
