@@ -27,8 +27,8 @@ namespace DuplicateFinder
                 bool scanDescriptions = Scan_Descriptions ?? default(bool);
                 bool searchEnhance = Search_Enhance ?? default(bool);
 
-                pruner.prune(0.90, 20, data.getRows(), scanDates, scanDescriptions, namePrecision, datePrecision, convertToQuadScale(descriptionPrecision), searchEnhance);
-                pruner.prune(0.90, 20, data.getReverseRows(), scanDates, scanDescriptions, namePrecision, datePrecision, convertToQuadScale(descriptionPrecision), searchEnhance);
+                pruner.prune(0.6, 20, data.getRows(), scanDates, scanDescriptions, namePrecision, datePrecision, convertToQuadScale(descriptionPrecision), searchEnhance);
+                pruner.prune(0.6, 20, data.getReverseRows(), scanDates, scanDescriptions, namePrecision, datePrecision, convertToQuadScale(descriptionPrecision), searchEnhance);
                 List<Cluster> clusters = data.getClusters();
 
                 foreach (Cluster c in data.getClusters())

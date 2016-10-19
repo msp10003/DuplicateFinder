@@ -11,15 +11,16 @@ namespace DuplicateFinderUnitTests
         public void jaroWinklerTest()
         {
             DuplicateFinder.StringComparer strComp = new DuplicateFinder.StringComparer();
-            double sim = DuplicateFinder.StringComparer.proximity("CAARTER AMY", "CARTER AMY J");
+            double sim = DuplicateFinder.StringComparer.proximity("TIMOTHY MILLER", "HAROLD MILLER");
+            double x = sim;
         }
 
         [TestMethod]
         public void CompareDescriptionTest()
         {
             DuplicateFinder.StringComparer strComp = new DuplicateFinder.StringComparer();
-            string desc1 = "string azfg cvs zxae utr 43 and some random text";
-            string desc2 = "sttah cvs zxae ufgjeitr ertpo random bext";
+            string desc1 = "Fell asleep after surgery";
+            string desc2 = "Went to sleep aeftyzt the surgery.";
             double sim = strComp.nGramCompareDesc(desc1, desc2);
             double x = sim;
         }

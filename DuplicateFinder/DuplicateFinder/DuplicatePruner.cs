@@ -7,10 +7,13 @@ namespace DuplicateFinder
 {
     class DuplicatePruner
     {
-        DataSet data;
-        StringComparer strComp;
-        ListPQ<Cluster> listPQ;
-
+        private DataSet data;
+        private StringComparer strComp;
+        private ListPQ<Cluster> listPQ;
+        public const int MAX_DAYS = 30;
+        public const double MIN_DESCRIPTION_SIM = 0.55;
+        public const double MIN_NAME_SIM = 0.8;
+       
         public DuplicatePruner(DataSet d)
         {
             data = d;
@@ -30,6 +33,8 @@ namespace DuplicateFinder
                 //TODO figure out how to do this with an enumerator
                 //List<Record> records = data.getRows();
                 List<Record> records = sortedTree;
+                double nameWeight =0, dateWeight=0, descriptionWeight=0;
+                calculateWeights(ref nameWeight,ref dateWeight,ref descriptionWeight, scanDates, scanDescriptions);
 
                 //row-by-row traversal of data set
                 foreach (Record current in records)
@@ -59,7 +64,7 @@ namespace DuplicateFinder
                             //if Auto Search is on, do one Compare method, if it's not, do the other one
                             if (autoSearch)
                             {
-                                inCluster = compareRecordToCluster(current, cluster, tolerance, node, scanDates, scanDescriptions);
+                                inCluster = compareRecordToClusterAuto(current, cluster, tolerance, node, scanDates, scanDescriptions, nameWeight, dateWeight, descriptionWeight);
                             }else{
                                 inCluster = compareRecordToCluster(current, cluster, tolerance, node, scanDates, scanDescriptions, namePrecision, datePrecision, descriptionPrecision);
                             }
@@ -140,44 +145,17 @@ namespace DuplicateFinder
         /// <summary>
         /// Checks whether record is in cluster, using pre-defined tolerance
         /// </summary>
-        private bool compareRecordToCluster(Record queryRecord, Cluster cluster, double tolerance, ListPQNode<Cluster> node, bool scanDates, bool scanDescriptions)
+        private bool compareRecordToClusterAuto(Record queryRecord, Cluster cluster, double tolerance, ListPQNode<Cluster> node, bool scanDates, bool scanDescriptions, double nameWeight, double dateWeight, double descriptionWeight)
         {
             bool result = false;
             foreach (Record r in cluster.getRecords())
             {   //check if record is similar enough to record in cluster to be added
 
-                //get initial similarity measure based on name
-                double similarity = strComp.jaroWinklerCompare(queryRecord, r);
+                double nameSimilarity = normalize(MIN_NAME_SIM, 1, strComp.jaroWinklerCompare(queryRecord, r));
+                double dateSimilarity = normalize(0, MAX_DAYS, compareDates(queryRecord, r));
+                double descriptionSimilarity = normalize(MIN_DESCRIPTION_SIM, 1, compareDescriptions(queryRecord, r));
 
-                //if the similarity is close to the tolerance, check the date
-                if (scanDates && (similarity < (tolerance + (tolerance * 0.07)))
-                    && similarity > tolerance - (tolerance * 0.07))
-                {
-                    similarity = compareDates(queryRecord, r, similarity);
-                }
-
-                //If still indecisive, check description
-                if (scanDescriptions && (similarity < (tolerance + (tolerance * 0.05)))    
-                    && similarity > tolerance - (tolerance * 0.05))
-                {
-                    if (queryRecord.getDescription() == null || r.getDescription() == null)
-                    {
-                        //deduct for not having a description, but don't kill it since it's likely it was simply forgotten
-                        similarity = similarity - (similarity * 0.1);
-                    }
-                    else
-                    {
-                        double descSimilarity = strComp.nGramCompareDesc(queryRecord, r);
-                        if (descSimilarity > tolerance)
-                        {
-                            similarity = similarity + (similarity * 0.08);
-                        }
-                        else if (descSimilarity < (0.5) * tolerance)
-                        {
-                            similarity = similarity - (similarity * 0.15);
-                        }
-                    }
-                }
+                double similarity = (nameSimilarity * nameWeight) + (dateSimilarity * dateWeight) + (descriptionSimilarity * descriptionWeight);
             
                 if (similarity >= tolerance)
                 {   //if yes, update the cluster
@@ -192,6 +170,47 @@ namespace DuplicateFinder
                 }
             }
             return result;
+        }
+
+        /// <summary>
+        /// Normalizes a a number in a range between 0 and 1.
+        /// </summary>
+        private double normalize(double min, double max, double x)
+        {
+            //drop things that fall below the desired range
+            if (x < min || x > max)
+            {
+                return 0;
+            }
+            return ((max - x) / (max - min));
+        }
+
+        /// <summary>
+        /// Caluclates relative weights for the total similarity
+        /// </summary>
+        private void calculateWeights(ref double nameWeight,ref double dateWeight,ref double descriptionWeight, bool scanDates, bool scanDescriptions)
+        {
+            if (!scanDates && scanDescriptions)
+            {
+                descriptionWeight = 0.3;
+            }
+            else if (!scanDescriptions && scanDates)
+            {
+                dateWeight = 0.3;
+            }
+            else if (!scanDates && !scanDescriptions)
+            {
+                dateWeight = 0;
+                descriptionWeight = 0;
+            }
+            else
+            {
+                dateWeight = 0.2;
+                descriptionWeight = 0.2;
+            }
+            nameWeight = 1 - (dateWeight + descriptionWeight);
+
+            return;
         }
 
         /// <summary>
@@ -219,42 +238,24 @@ namespace DuplicateFinder
             double dateDiff = Math.Abs((d1 - d2).TotalDays);
 
             //TODO: scale the similarity based on a bell curve, with close dates yielding high and futher dates disproportionately less
-            return (dateDiff / (-120) + 1);
+            return dateDiff;
         }
 
         /// <summary>
-        /// Compares similarity alteration based on date. To be used with auto-search
+        /// Compares similarity alteration based on date. To be used with auto-search. Keeps similarity normalized between 0 and 1.
         /// </summary>
-        private double compareDates(Record queryRecord, Record r1, double similarity)
+        private double updateSimilarityFromDates(Record queryRecord, Record r1, double similarity)
         {
-            DateTime d1 = queryRecord.getDate();
-            DateTime d2 = r1.getDate();
-            if (d1.Equals(new DateTime(1900, 1, 1)) || d2.Equals(new DateTime(1900, 1, 1)))
+            double dateSimilarity = compareDates(queryRecord, r1);
+            //add or deduct from the similarity using the factor defined by the line y = 2x -1
+            double scaleFactor = (2 * dateSimilarity - 1);
+            if (scaleFactor >= 0)
             {
-                //one of the records didn't have a date, disregard this comparison
-                return similarity;
+                similarity = similarity + ((1 - 0.999 * similarity) * scaleFactor);
             }
-            if (d1.Year < 10)
+            else
             {
-                d1.AddYears(2000);
-            }
-
-            if (d2.Year < 10)
-            {
-                d2.AddYears(2000);
-            }
-            double dateDiff = Math.Abs((d1 - d2).TotalDays);
-            if (dateDiff == 0)
-            {
-                similarity = similarity + (similarity * 0.2);
-            }
-            else if (dateDiff <= 2)
-            {
-                similarity = similarity + (similarity * 0.1);
-            }
-            else if (dateDiff >= 14)
-            {
-                similarity = similarity - (similarity * 0.1);
+                similarity = similarity + (similarity) * scaleFactor/2;
             }
             return similarity;
         }
@@ -267,7 +268,7 @@ namespace DuplicateFinder
             double descSimilarity = strComp.nGramCompareDesc(queryRecord, r);
             return descSimilarity;
         }
-        
+
         /// <summary>
         /// Adds the record to the given cluster and updates the underlying clusters collection
         /// </summary>
