@@ -40,7 +40,7 @@ namespace DuplicateFinder
                     //first check if the record's cluster is already on the PQ
                     if (searchPQ(current))
                     {
-                        continue;       //if  yes, move on to the next record
+                        continue;       //if yes, move on to the next record
                     }
                     else
                     {   //if PQ is empty, add this cluster
@@ -134,9 +134,6 @@ namespace DuplicateFinder
                     break;
                 }
             }
-            //if we've looked through all the cluster records with no luck, this must belong to its own cluster, so add it to PQ
-            insertPQ(queryRecord.getCluster());
-
             return result;
         }
 
@@ -149,28 +146,39 @@ namespace DuplicateFinder
             foreach (Record r in cluster.getRecords())
             {   //check if record is similar enough to record in cluster to be added
 
-                double similarity = strComp.jaroWinklerCompare(queryRecord, r);   //get initial similarity measure
+                //get initial similarity measure based on name
+                double similarity = strComp.jaroWinklerCompare(queryRecord, r);
 
-                if (scanDates && (similarity < (tolerance + (tolerance * 0.07)))                //if the similarity is close around the tolerance, check the date
+                //if the similarity is close to the tolerance, check the date
+                if (scanDates && (similarity < (tolerance + (tolerance * 0.07)))
                     && similarity > tolerance - (tolerance * 0.07))
                 {
                     similarity = compareDates(queryRecord, r, similarity);
                 }
 
-                if (scanDescriptions && (similarity < (tolerance + (tolerance * 0.05)))    //if the similarity is still indecisive, check the description as a last resort
+                //If still indecisive, check description
+                if (scanDescriptions && (similarity < (tolerance + (tolerance * 0.05)))    
                     && similarity > tolerance - (tolerance * 0.05))
                 {
-                    double descSimilarity = strComp.nGramCompareDesc(queryRecord, r);
-                    if (descSimilarity > tolerance)
+                    if (queryRecord.getDescription() == null || r.getDescription() == null)
                     {
-                        similarity = similarity + (similarity * 0.08);
+                        //deduct for not having a description, but don't kill it since it's likely it was simply forgotten
+                        similarity = similarity - (similarity * 0.1);
                     }
-                    else if (descSimilarity < (0.5) * tolerance)
+                    else
                     {
-                        similarity = similarity - (similarity * 0.15);
+                        double descSimilarity = strComp.nGramCompareDesc(queryRecord, r);
+                        if (descSimilarity > tolerance)
+                        {
+                            similarity = similarity + (similarity * 0.08);
+                        }
+                        else if (descSimilarity < (0.5) * tolerance)
+                        {
+                            similarity = similarity - (similarity * 0.15);
+                        }
                     }
                 }
-
+            
                 if (similarity >= tolerance)
                 {   //if yes, update the cluster
                     addRecordToCluster(queryRecord, cluster);
@@ -183,9 +191,6 @@ namespace DuplicateFinder
                     break;
                 }
             }
-            //if we've looked through all the cluster records with no luck, this must belong to its own cluster, so add it to PQ
-            //insertPQ(queryRecord.getCluster());
-
             return result;
         }
 
