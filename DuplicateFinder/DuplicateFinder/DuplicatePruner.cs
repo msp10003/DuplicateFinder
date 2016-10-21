@@ -11,8 +11,10 @@ namespace DuplicateFinder
         private StringComparer strComp;
         private ListPQ<Cluster> listPQ;
         public const int MAX_DAYS = 30;
-        public const double MIN_DESCRIPTION_SIM = 0.55;
-        public const double MIN_NAME_SIM = 0.8;
+        public const double MIN_DESCRIPTION_SIM = 0.50;
+        public const double MAX_DESCRIPTION_SIM = 0.90;
+        public const double MIN_NAME_SIM = 0.76;
+        public const int TOLERANCE_DISCARD_FACTOR = 2;
        
         public DuplicatePruner(DataSet d)
         {
@@ -33,8 +35,6 @@ namespace DuplicateFinder
                 //TODO figure out how to do this with an enumerator
                 //List<Record> records = data.getRows();
                 List<Record> records = sortedTree;
-                double nameWeight =0, dateWeight=0, descriptionWeight=0;
-                calculateWeights(ref nameWeight,ref dateWeight,ref descriptionWeight, scanDates, scanDescriptions);
 
                 //row-by-row traversal of data set
                 foreach (Record current in records)
@@ -64,7 +64,7 @@ namespace DuplicateFinder
                             //if Auto Search is on, do one Compare method, if it's not, do the other one
                             if (autoSearch)
                             {
-                                inCluster = compareRecordToClusterAuto(current, cluster, tolerance, node, scanDates, scanDescriptions, nameWeight, dateWeight, descriptionWeight);
+                                inCluster = compareRecordToClusterAuto(current, cluster, tolerance, node, scanDates, scanDescriptions);
                             }else{
                                 inCluster = compareRecordToCluster(current, cluster, tolerance, node, scanDates, scanDescriptions, namePrecision, datePrecision, descriptionPrecision);
                             }
@@ -145,15 +145,37 @@ namespace DuplicateFinder
         /// <summary>
         /// Checks whether record is in cluster, using pre-defined tolerance
         /// </summary>
-        private bool compareRecordToClusterAuto(Record queryRecord, Cluster cluster, double tolerance, ListPQNode<Cluster> node, bool scanDates, bool scanDescriptions, double nameWeight, double dateWeight, double descriptionWeight)
+        private bool compareRecordToClusterAuto(Record queryRecord, Cluster cluster, double tolerance, ListPQNode<Cluster> node, bool scanDates, bool scanDescriptions)
         {
             bool result = false;
+            
             foreach (Record r in cluster.getRecords())
             {   //check if record is similar enough to record in cluster to be added
+                double nameWeight = 0; double dateWeight = 0; double descriptionWeight = 0; //will be used to determine how much weight to give to each field
+                double nameSimilarity = 0; double dateSimilarity = 0; double descriptionSimilarity = 0;
 
-                double nameSimilarity = normalize(MIN_NAME_SIM, 1, strComp.jaroWinklerCompare(queryRecord, r));
-                double dateSimilarity = normalize(0, MAX_DAYS, compareDates(queryRecord, r));
-                double descriptionSimilarity = normalize(MIN_DESCRIPTION_SIM, 1, compareDescriptions(queryRecord, r));
+                nameSimilarity = normalize(MIN_NAME_SIM, 1, strComp.jaroWinklerCompare(queryRecord, r));
+                //account for cases where one or both of the records are missing a date - ignore the field in calculation
+                if (queryRecord.getDate().Equals(new DateTime(1900,1,1)) || r.getDate().Equals(new DateTime(1900,1,1)))
+                {
+                    scanDates = false;
+                }
+                else
+                {
+                    dateSimilarity = normalize(0, MAX_DAYS, (MAX_DAYS - compareDates(queryRecord, r)));
+                }
+                
+                //do the same for descriptions
+                if (String.IsNullOrEmpty(queryRecord.getDescription()) || String.IsNullOrEmpty(r.getDescription()))
+                {
+                    scanDescriptions = false;
+                }
+                else
+                {
+                    descriptionSimilarity = normalize(MIN_DESCRIPTION_SIM, MAX_DESCRIPTION_SIM, compareDescriptions(queryRecord, r));
+                }
+
+                calculateWeights(ref nameWeight,ref dateWeight,ref descriptionWeight, scanDates, scanDescriptions);
 
                 double similarity = (nameSimilarity * nameWeight) + (dateSimilarity * dateWeight) + (descriptionSimilarity * descriptionWeight);
             
@@ -164,7 +186,7 @@ namespace DuplicateFinder
                     result = true;
                     break;
                 }
-                else if (similarity < 0.5)    //if the similarity is way off, don't bother checking the rest of the cluster
+                else if (similarity < tolerance/TOLERANCE_DISCARD_FACTOR)    //if the similarity is way off, don't bother checking the rest of the cluster
                 {
                     break;
                 }
@@ -178,11 +200,17 @@ namespace DuplicateFinder
         private double normalize(double min, double max, double x)
         {
             //drop things that fall below the desired range
-            if (x < min || x > max)
+            if (x < min) 
             {
                 return 0;
             }
-            return ((max - x) / (max - min));
+            //if anything is higher than our threshold, just give full credit
+            if (x > max)
+            {
+                return 1;
+            }
+
+            return ((x-min) / (max - min));
         }
 
         /// <summary>
