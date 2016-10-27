@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using DuplicateFinder;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace DuplicateFinderGUI
@@ -55,8 +56,16 @@ namespace DuplicateFinderGUI
                 Int32.TryParse(NumCols.Text, out numCols);
 
                 Executor executor = new Executor();
+
+                //get list of descriptions to ignore
+                List<String> ignoreList = new List<String>();
+                if (!String.IsNullOrEmpty(Ignore1.Text)) ignoreList.Add(Ignore1.Text);
+                if (!String.IsNullOrEmpty(Ignore2.Text)) ignoreList.Add(Ignore2.Text);
+                if (!String.IsNullOrEmpty(Ignore3.Text)) ignoreList.Add(Ignore3.Text);
+                
                 executor.execute(Source_Spreadsheet_Path.Text, Destination_Spreadsheet_Path.Text, nameCol, dateCol, descCol, 
-                    numCols, NamePrecisionSlider.Value, Scan_Dates_Checkbox.IsChecked, Scan_Descriptions_Checkbox.IsChecked, DatePrecisionSlider.Value, DescriptionPrecisionSlider.Value, AutoSearchCheckbox.IsChecked);
+                    numCols, NamePrecisionSlider.Value, Scan_Dates_Checkbox.IsChecked, Scan_Descriptions_Checkbox.IsChecked,
+                    DatePrecisionSlider.Value, DescriptionPrecisionSlider.Value, AutoSearchCheckbox.IsChecked, ignoreList);
 
                 Alert_Text.Text = "Successfully scanned file for duplicates! Check the new file created for results!";
                 Alert_Text.Foreground = Brushes.LimeGreen;

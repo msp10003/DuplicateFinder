@@ -27,7 +27,7 @@ namespace DuplicateFinder
         /// </summary>
         /// <param name="tolerance">pre-determined level of acceptance, for use with auto search</param>
         /// <param name="pqSize">size of the priority queue to be used for storing clusters</param>
-        public void prune(double tolerance, int pqSize, List<Record> sortedTree, bool scanDates, bool scanDescriptions, double namePrecision, double datePrecision, double descriptionPrecision, bool autoSearch)
+        public void prune(double tolerance, int pqSize, List<Record> sortedTree, bool scanDates, bool scanDescriptions, double namePrecision, double datePrecision, double descriptionPrecision, bool autoSearch, List<String> ignoreList)
         {
             try
             {
@@ -64,7 +64,7 @@ namespace DuplicateFinder
                             //if Auto Search is on, do one Compare method, if it's not, do the other one
                             if (autoSearch)
                             {
-                                inCluster = compareRecordToClusterAuto(current, cluster, tolerance, node, scanDates, scanDescriptions);
+                                inCluster = compareRecordToClusterAuto(current, cluster, tolerance, node, scanDates, scanDescriptions, ignoreList);
                             }else{
                                 inCluster = compareRecordToCluster(current, cluster, tolerance, node, scanDates, scanDescriptions, namePrecision, datePrecision, descriptionPrecision);
                             }
@@ -145,7 +145,7 @@ namespace DuplicateFinder
         /// <summary>
         /// Checks whether record is in cluster, using pre-defined tolerance
         /// </summary>
-        private bool compareRecordToClusterAuto(Record queryRecord, Cluster cluster, double tolerance, ListPQNode<Cluster> node, bool scanDates, bool scanDescriptions)
+        private bool compareRecordToClusterAuto(Record queryRecord, Cluster cluster, double tolerance, ListPQNode<Cluster> node, bool scanDates, bool scanDescriptions, List<String> ignoreList)
         {
             bool result = false;
             
@@ -166,7 +166,7 @@ namespace DuplicateFinder
                 }
                 
                 //do the same for descriptions
-                if (String.IsNullOrEmpty(queryRecord.getDescription()) || String.IsNullOrEmpty(r.getDescription()))
+                if ((scanDescriptions == false) || IgnoreDescriptions(queryRecord,r,ignoreList))
                 {
                     scanDescriptions = false;
                 }
@@ -330,6 +330,30 @@ namespace DuplicateFinder
                 if(r.getCluster() == n.getValue())
                 {
                     listPQ.setMax(n);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Checks if the descriptions are either empty or contain something that should be ignored
+        /// </summary>
+        private bool IgnoreDescriptions(Record queryRecord, Record r, List<String> ignoreList){
+
+            if (String.IsNullOrEmpty(queryRecord.getDescription()) || String.IsNullOrEmpty(r.getDescription()))
+            {
+                return true;
+            }
+
+            foreach (String s in ignoreList)
+            {
+                if (queryRecord.getDescription() == s)
+                {
+                    return true;
+                }
+                else if (r.getDescription() == s)
+                {
                     return true;
                 }
             }

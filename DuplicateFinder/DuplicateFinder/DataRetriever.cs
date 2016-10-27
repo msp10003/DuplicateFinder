@@ -163,5 +163,25 @@ namespace DuplicateFinder
             }
             
         }
+
+        public void writeNames(List<Record> records, String pathName)
+        {
+            try
+            {
+                SLDocument targetFile = new SLDocument(pathName);
+                SLStyle style = targetFile.CreateStyle();
+                
+                foreach (Record r in records)
+                {
+                    targetFile.SetCellValue(r.getID(), numCols + 2, r.getLastName() +" ," + r.getFirstName()+" " +r.getMiddleName());
+                }
+
+                targetFile.Save();
+            }
+            catch
+            {
+                throw (new Exception("There was a problem creating the output spreadsheet"));
+            }
+        }
     }
 }

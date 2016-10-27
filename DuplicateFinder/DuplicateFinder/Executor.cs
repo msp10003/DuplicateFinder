@@ -14,7 +14,7 @@ namespace DuplicateFinder
 
         }
 
-        public void execute(String inputPath, String outputPath, String nameCol, String dateCol, String descCol, int numberOfColumns, double namePrecision, bool? Scan_Dates, bool? Scan_Descriptions, double datePrecision, double descriptionPrecision, bool? Search_Enhance)
+        public void execute(String inputPath, String outputPath, String nameCol, String dateCol, String descCol, int numberOfColumns, double namePrecision, bool? Scan_Dates, bool? Scan_Descriptions, double datePrecision, double descriptionPrecision, bool? Search_Enhance, List<String> ignoreList)
         {
             try
             {
@@ -27,8 +27,8 @@ namespace DuplicateFinder
                 bool scanDescriptions = Scan_Descriptions ?? default(bool);
                 bool searchEnhance = Search_Enhance ?? default(bool);
 
-                pruner.prune(0.6, 20, data.getRows(), scanDates, scanDescriptions, namePrecision, datePrecision, convertToQuadScale(descriptionPrecision), searchEnhance);
-                pruner.prune(0.6, 20, data.getReverseRows(), scanDates, scanDescriptions, namePrecision, datePrecision, convertToQuadScale(descriptionPrecision), searchEnhance);
+                pruner.prune(0.6, 20, data.getRows(), scanDates, scanDescriptions, namePrecision, datePrecision, convertToQuadScale(descriptionPrecision), searchEnhance, ignoreList);
+                pruner.prune(0.6, 20, data.getReverseRows(), scanDates, scanDescriptions, namePrecision, datePrecision, convertToQuadScale(descriptionPrecision), searchEnhance, ignoreList);
                 List<Cluster> clusters = data.getClusters();
 
                 foreach (Cluster c in data.getClusters())
@@ -43,6 +43,7 @@ namespace DuplicateFinder
                 rowCount = data.getNumRows();
 
                 dataRetriever.copySpreadsheetToFile(outputPath);
+                dataRetriever.writeNames(data.getRows(), outputPath);
                 dataRetriever.writeDuplicates(data.getClusters(), outputPath);
             }
             catch (Exception e)
